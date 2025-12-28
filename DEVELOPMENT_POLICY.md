@@ -22,3 +22,7 @@ The visual design, sizing, spacing, and animations of this project are the autho
 
 - Always test changes in-browser to confirm that animations, interactions, and layouts match the author's original intent.
 - Use screenshots to track any subtle visual shifts during refactoring.
+
+## 🚫 デプロイの禁止
+
+- **AI機能で勝手にデプロイすることを禁じます**：意図しない変更をそのままコミットしてデプロイしてしまうことを3回観測したためです。このプロジェクトのデプロイは許可なく行わないでください。
