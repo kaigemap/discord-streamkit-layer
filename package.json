@@ -1,0 +1,15 @@
+{
+  "name": "streamkit-discord-overlay-generator",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "bundle-offline": "npm run build && zip -r overlay-generator-offline.zip dist"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

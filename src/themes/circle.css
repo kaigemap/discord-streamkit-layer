@@ -1,0 +1,68 @@
+/* Theme: Circle */
+
+/* --- Container --- */
+ul[class^="Voice_voiceStates"] {
+  display: flex !important;
+}
+
+/* --- User Base --- */
+li[class^="Voice_voiceState"] {
+  position: relative !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: {{avatarSize}}px !important;
+  height: {{avatarSize}}px !important; /* Ensure the li is a square matches the avatar */
+}
+
+/* Avatar Base Style */
+img[class*="Voice_avatar"] {
+  width: {{avatarSize}}px !important;
+  height: {{avatarSize}}px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px rgb(160, 160, 160);
+  transition: 0.1s;
+  filter: brightness(60%);
+  margin: 0 !important;
+  display: block !important;
+}
+
+/* Name Container - Positioned at the bottom for overlap */
+div[class^="Voice_user"] {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  display: block !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+/* Name Style */
+span[class^="Voice_name"] {
+  width: 100% !important;
+  display: block !important;
+  text-align: right !important; /* User requested right-aligned */
+  padding: 0 !important;
+  margin: 0 !important;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 100));
+  line-height: 1 !important; /* Tight line height for precise bottom alignment */
+  
+  /* Clipping Protection */
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+/* --- User Highlight --- */
+img[src*="USER_ID"][class*="Voice_avatar"] {
+  box-shadow: 0 0 0 4px var(--user-color);
+}
+
+/* --- User Speaking --- */
+img[src*="USER_ID"][class*="Voice_avatarSpeaking"] {
+  filter: brightness(100%);
+  box-shadow: 0 0 0 4px var(--user-color), 0 0 0 16px var(--user-color-alpha);
+  animation: bounce-anim 0.6s infinite !important;
+}

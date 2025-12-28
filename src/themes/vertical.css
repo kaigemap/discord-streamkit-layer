@@ -1,0 +1,61 @@
+/* Theme: Vertical */
+
+/* --- Container --- */
+ul[class^="Voice_voiceStates"] {
+  display: flex;
+  flex-direction: column;
+  width: min-content;
+}
+
+/* --- User Base --- */
+li[class^="Voice_voiceState"] {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12px;
+  width: auto;
+  height: auto;
+  padding: 0;
+}
+
+/* Avatar Base Style */
+img[class*="Voice_avatar"] {
+  margin-right: 12px;
+  width: {{avatarSize}}px;
+  height: {{avatarSize}}px;
+  border-radius: 50%;
+  transition: 0.1s;
+  filter: brightness(60%);
+  border: 0;
+  box-shadow: 0 0 0 3px rgb(160, 160, 160);
+}
+
+/* Name Style */
+span[class^="Voice_name"] {
+  padding: 0;
+  word-break: keep-all;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 100));
+  background-color: rgba(30, 33, 36, 0) !important;
+  display: block;
+  text-align: left;
+  
+  /* Clipping Protection */
+  max-width: none;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+
+/* --- User Highlight --- */
+img[src*="USER_ID"][class*="Voice_avatar"] {
+  box-shadow: 0 0 0 3px var(--user-color);
+}
+
+/* --- User Speaking --- */
+img[src*="USER_ID"][class*="Voice_avatarSpeaking"] {
+  filter: brightness(100%);
+  box-shadow: 0 0 0 3px var(--user-color), 0 0 12px var(--user-color-alpha);
+  animation: bounce-anim 0.6s infinite !important;
+}

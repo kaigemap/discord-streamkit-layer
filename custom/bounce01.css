@@ -1,0 +1,109 @@
+/* Discord User ID (Sanple)
+User1: 123456789000001
+User2: 123456789000002
+User3: 123456789000003 */
+
+.voice-state[data-reactid*="123456789000001"] .avatar {
+  box-shadow: 0 0 0 0.2em rgb(181, 75, 67) !important;
+}
+.voice-state[data-reactid*="123456789000001"] .avatar.speaking {
+  box-shadow: 0 0 0 0.2em rgb(181, 75, 67), 0 0 0 0.75rem rgba(181, 75, 67, 0.4) !important;
+}
+.voice-state[data-reactid*="123456789000002"] .avatar {
+  box-shadow: 0 0 0 0.2em rgb(67, 75, 181) !important;
+}
+.voice-state[data-reactid*="123456789000002"] .avatar.speaking {
+  box-shadow: 0 0 0 0.2em rgb(67, 75, 181), 0 0 0 0.75rem rgba(67, 75, 181, 0.4) !important;
+}
+
+body {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.voice-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.voice-container .voice-states {
+  list-style-type: none;
+  width: 100%;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-container .voice-states .voice-state {
+  position: relative;
+  width: 6rem;
+  height: 8rem;
+}
+
+.voice-container .voice-states .voice-state .avatar {
+  position: absolute;
+  margin-right: 0;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  left: 0.9rem;
+  top: 2rem;
+  transition: 0.1s;
+  filter: brightness(50%);
+  border: 0;
+  box-shadow: 0 0 0 0.2rem rgb(67, 181, 129);
+}
+.voice-container .voice-states .voice-state .avatar.speaking {
+  filter: brightness(100%);
+  animation: bound-anim 0.5s 0s infinite;
+  border: 0;
+  box-shadow: 0 0 0 0.2rem rgb(67, 181, 129), 0 0 0 0.75rem rgba(67, 181, 129, 0.5);
+}
+
+@keyframes bound-anim {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  30% {
+    transform: translate(0, -1rem);
+  }
+  50% {
+    transform: scale(1);
+  }
+  90% {
+    transform: scale(1.05, 0.9);
+  }
+}
+
+.voice-container .voice-states .voice-state .user {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-container .voice-states .voice-state .user .name {
+  position: absolute;
+  top: 6.8rem;
+  left: 0;
+  display: block;
+  text-align: center;
+  padding: 4px 6px;
+  margin: 1%;
+  text-overflow: clip;
+  width: 98%;
+  overflow: hidden;
+  box-sizing: border-box;
+  white-space: nowrap;
+  font-size: 0.825rem !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  border-radius: 0.2rem !important;
+}

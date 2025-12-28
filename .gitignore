@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+
+# Development files
+test-output.css
+BACKLOG.md
+
+# Custom files (if not needed for public)
+# custom/  # Uncomment if custom files should be ignored
+
+# Temporary files
+*.log
+*.tmp

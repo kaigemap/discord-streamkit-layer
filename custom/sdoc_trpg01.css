@@ -1,0 +1,144 @@
+/* Discord User ID (Sanple)
+User1: 123456789000001
+User2: 123456789000002
+User3: 123456789000003 */
+
+.voice-state[data-reactid*="123456789000001"] .avatar {
+  box-shadow: 0 0 0 0.2em rgb(181, 75, 67) !important;
+}
+.voice-state[data-reactid*="123456789000001"] .avatar.speaking {
+  box-shadow: 0 0 0 0.2em rgb(181, 75, 67), 0 0 0 0.8em rgba(181, 75, 67, 0.4) !important;
+}
+.voice-state[data-reactid*="123456789000001"] .avatar + .user::before {
+  background: 50% 5% / 32rem no-repeat
+    url("https://cdn.discordapp.com/attachments/703437342542921749/970672397051117628/02a1c8ca319c1490.png");
+}
+
+.voice-state[data-reactid*="123456789000002"] .avatar {
+  box-shadow: 0 0 0 0.2em rgb(67, 75, 181) !important;
+}
+.voice-state[data-reactid*="123456789000002"] .avatar.speaking {
+  box-shadow: 0 0 0 0.2em rgb(67, 75, 181), 0 0 0 0.8em rgba(67, 75, 181, 0.4) !important;
+}
+.voice-state[data-reactid*="123456789000002"] .avatar + .user::before {
+  background: 1rem 0% / 26rem no-repeat
+    url("https://cdn.discordapp.com/attachments/703437342542921749/971514509665660958/oharai.png");
+}
+
+.voice-state[data-reactid*="123456789000003"] .avatar + .user::before {
+  background: 50% 3% / 20rem no-repeat
+    url("https://cdn.discordapp.com/attachments/703437342542921749/783000628444004442/mamori.png");
+}
+
+body {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.voice-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.voice-container .voice-states {
+  list-style-type: none;
+  width: 100%;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-container .voice-states .voice-state {
+  position: relative;
+  width: 12rem;
+  height: 18rem;
+}
+
+.voice-container .voice-states .voice-state .avatar {
+  position: absolute;
+  margin-right: 0;
+  width: 4rem;
+  height: 4rem;
+  bottom: 2.6rem;
+  right: 1rem;
+  transition: 0.1s;
+  filter: brightness(100%);
+  border: 0;
+  box-shadow: 0 0 0 0.2em rgb(67, 181, 129);
+}
+.voice-container .voice-states .voice-state .avatar.speaking {
+  filter: brightness(100%);
+  animation: bound-anim 0.5s 0s infinite;
+  border: 0;
+  box-shadow: 0 0 0 0.2em rgb(67, 181, 129), 0 0 0 0.8em rgba(67, 181, 129, 0.4);
+}
+
+@keyframes bound-anim {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  30% {
+    transform: translate(0, -1rem);
+  }
+  50% {
+    transform: scale(1);
+  }
+  90% {
+    transform: scale(1.1, 0.9);
+  }
+}
+
+.voice-container .voice-states .voice-state .user {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-container .voice-states .voice-state .user::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  z-index: -1;
+  top: 0;
+  left: -50%;
+  filter: brightness(60%);
+}
+
+.voice-container .voice-states .voice-state .avatar.speaking + .user::before {
+  filter: brightness(100%);
+  animation: speak-now 0.6s 0s 1;
+}
+
+@keyframes speak-now {
+  0% {
+    transform: translateY(0);
+  }
+  15% {
+    transform: translateY(-1rem);
+  }
+  30% {
+    transform: translateY(0);
+  }
+}
+
+.voice-container .voice-states .voice-state .user .name {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  min-width: 5.2rem;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 6px;
+}

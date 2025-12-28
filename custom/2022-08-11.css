@@ -1,0 +1,151 @@
+/* Discord User ID (Sanple)
+ぎょ: 597406279526252556
+もこ: 394313388932464651
+こうき: 637141338533396480
+きさいち: 647429629904420875
+カイゲ2nd: 785446182247071764
+*/
+
+
+
+.voice-container .voice-states .voice-state[data-reactid*="597406279526252556"] {
+  left: 1288px;
+  top: 255px;
+}
+.voice-state[data-reactid*="597406279526252556"] .avatar {
+  box-shadow: 0 0 0 6px rgb(57, 163, 212) !important;
+}
+.voice-state[data-reactid*="597406279526252556"] .avatar.speaking {
+  box-shadow: 0 0 0 6px rgb(57, 163, 212), 0 0 0 18px rgba(57, 163, 212, 0.4) !important;
+}
+
+.voice-container .voice-states .voice-state[data-reactid*="394313388932464651"] {
+  left: 1720px;
+  top: 288px;
+}
+.voice-state[data-reactid*="394313388932464651"] .avatar {
+  box-shadow: 0 0 0 6px rgb(212, 132, 57) !important;
+}
+.voice-state[data-reactid*="394313388932464651"] .avatar.speaking {
+  box-shadow: 0 0 0 6px rgb(212, 132, 57), 0 0 0 18px rgba(212, 132, 57, 0.4) !important;
+}
+
+.voice-container .voice-states .voice-state[data-reactid*="637141338533396480"] {
+  left: 1026px;
+  top: 730px;
+}
+.voice-state[data-reactid*="637141338533396480"] .avatar {
+  box-shadow: 0 0 0 6px rgb(81, 25, 172) !important;
+}
+.voice-state[data-reactid*="637141338533396480"] .avatar.speaking {
+  box-shadow: 0 0 0 6px rgb(81, 25, 172), 0 0 0 18px rgba(81, 25, 172, 0.4) !important;
+}
+
+.voice-container .voice-states .voice-state[data-reactid*="647429629904420875"] {
+  left: 1468px;
+  top: 770px;
+}
+.voice-state[data-reactid*="647429629904420875"] .avatar {
+  box-shadow: 0 0 0 6px rgb(185, 212, 31) !important;
+}
+.voice-state[data-reactid*="647429629904420875"] .avatar.speaking {
+  box-shadow: 0 0 0 6px rgb(185, 212, 31), 0 0 0 18px rgba(185, 212, 31, 0.4) !important;
+}
+
+.voice-container .voice-states .voice-state[data-reactid*="785446182247071764"] {
+  display: none;
+}
+
+
+body {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 1920px;
+  height: 1080px;
+}
+
+.voice-container {
+  width: 1920px;
+  height: 1080px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.voice-container .voice-states {
+  list-style-type: none;
+  width: 1920px;
+  height: 1080px;
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-container .voice-states .voice-state {
+  position: absolute;
+  width: 160px;
+  height:160px;
+}
+
+.voice-container .voice-states .voice-state .avatar {
+  position: absolute;
+
+  margin-right: 0;
+  width: 110px;
+  height: 110px;
+  top: 40px;
+  left: 25px;
+  transition: 0.1s;
+  filter: brightness(60%);
+  border: 0;
+  box-shadow: 0 0 0 6px rgb(67, 181, 129);
+}
+.voice-container .voice-states .voice-state .avatar.speaking {
+  filter: brightness(100%);
+  animation: bound-anim 0.4s 0s infinite;
+  border: 0;
+  box-shadow: 0 0 0 6px rgb(67, 181, 129), 0 0 0 18px rgba(67, 181, 129, 0.4);
+}
+
+@keyframes bound-anim {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  30% {
+    transform: translate(0, -1rem);
+  }
+  50% {
+    transform: scale(1);
+  }
+  90% {
+    transform: scale(1.1, 0.9);
+  }
+}
+
+.voice-container .voice-states .voice-state .user {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-container .voice-states .voice-state .user .name {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  min-width: 5.2rem;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 6px;
+  background-color: rgba(0, 0, 0, 0) !important;
+  text-shadow: 1px 1px 4px #000000;
+  font-size: 20px !important;
+}
