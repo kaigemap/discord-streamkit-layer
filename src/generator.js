@@ -27,7 +27,7 @@ body {
 }
 
 /* Global Layout & Sizes */
-ul[class^="Voice_voiceStates"] {
+ul[class*="Voice_voiceStates"] {
   display: flex !important;
   flex-direction: ${direction} !important;
   flex-wrap: ${wrap} !important;
@@ -35,14 +35,17 @@ ul[class^="Voice_voiceStates"] {
   gap: ${gap}px !important;
   width: 100% !important;
   height: auto !important;
+  margin-left: 10px !important;
+  margin-top: 10px !important;
+  padding: 20px !important; /* Padding for animation overflow in OBS */
 }
 
-span[class^="Voice_name"] {
+span[class*="Voice_name"] {
   font-size: ${baseFontSize}px !important;
   display: block;
 }
 
-li[class^="Voice_voiceState"] {
+li[class*="Voice_voiceState"] {
   align-items: center !important;
   margin: 0 !important; /* Reset legacy margins to favor Flex Gap */
 }
@@ -59,7 +62,7 @@ img[class*="Voice_avatar"] {
 
   // If Solo-mode is ON, hide everyone by default
   if (config.onlyRegistered) {
-    css += `\n/* Solo Mode: Hide all by default */\nli[class^="Voice_voiceState"] {\n  display: none !important;\n}\n`;
+    css += `\n/* Solo Mode: Hide all by default */\nli[class*="Voice_voiceState"] {\n  display: none !important;\n}\n`;
   }
 
   css += structuralStyles.replace(/{{avatarSize}}/g, avatarSize);
@@ -70,42 +73,45 @@ img[class*="Voice_avatar"] {
   sortedDisplayedUsers.forEach((user, index) => {
     if (!user.id) return;
 
+    // Ensure user.id is a string and safe
+    const safeUserId = String(user.id).replace(/[^a-zA-Z0-9_]/g, '');
+
     const defaultName = user.name || `User ${index + 1}`;
     const displayName = user.displayName && user.displayName.trim() !== '' ? user.displayName : defaultName;
 
     // Check per-user visibility (Hide-list)
     if (user.isHidden) {
-      css += `\n/* User ${displayName} is in Hide-list */\nli[class^="Voice_voiceState"]:has(img[src*="${user.id}"]) {\n  display: none !important;\n}\n`;
+      css += `\n/* User ${displayName} is in Hide-list */\nli[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  display: none !important;\n}\n`;
       return; // Skip other styles for hidden users
     }
 
     const colorRGBA = hexToRgba(user.color, 0.4);
 
     let userCSS = perUserStyles
-      .replace(/USER_ID/g, user.id)
+      .replace(/USER_ID/g, safeUserId)
       .replace(/var\(--user-color\)/g, user.color)
       .replace(/var\(--user-color-alpha\)/g, colorRGBA)
       .replace(/{{avatarSize}}/g, avatarSize);
 
     // Always override with displayName
-    userCSS += `\n/* Override custom name */\nimg[src*="${user.id}"] + div[class^="Voice_user"] span[class^="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: ${baseFontSize}px !important;\n}\nimg[src*="${user.id}"] + div[class^="Voice_user"] span[class^="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
+    userCSS += `\n/* Override custom name */\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: ${baseFontSize}px !important;\n}\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
 
     css += `\n/* User: ${displayName} */\n`;
     // If Solo Mode is ON, we must force-show the registered players
     if (config.onlyRegistered) {
-      css += `li[class^="Voice_voiceState"]:has(img[src*="${user.id}"]) {\n  display: flex !important;\n}\n`;
+      css += `li[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  display: flex !important;\n}\n`;
     }
     css += `${userCSS}\n`;
 
     // If Solo Mode is ON, explicitly hide unset users
     if (config.onlyRegistered && user.id.startsWith('unset_')) {
-      css += `li[class^="Voice_voiceState"]:has(img[src*="${user.id}"]) {\n  display: none !important;\n}\n`;
+      css += `li[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  display: none !important;\n}\n`;
     }
   });
 
   // Global Name Visibility Control
   if (config.hideNames) {
-    css += `\n/* Global Hide Names */\nspan[class^="Voice_name"] {\n  display: none !important;\n}\n`;
+    css += `\n/* Global Hide Names */\nspan[class*="Voice_name"] {\n  display: none !important;\n}\n`;
   }
 
   // Add Keyframe Animations

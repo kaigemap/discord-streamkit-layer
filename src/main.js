@@ -339,7 +339,7 @@ function renderThemeSelector() {
     const shadow = previewContainer.attachShadow({ mode: 'open' });
     
     // Basic simulator HTML
-    // Basic simulator HTML with Discord class structure
+    // Basic simulator HTML with Discord class structure (based on real Discord HTML)
     const miniUsers = [
       { id: 'mini1', color: '#ff4b4b' }
     ];
@@ -347,8 +347,8 @@ function renderThemeSelector() {
     const userHtml = miniUsers.map((u, i) => `
       <li class="Voice_voiceState voice_state" data-userid="${u.id}">
         <img class="Voice_avatar voice_avatar Voice_avatarSpeaking" src="https://cdn.discordapp.com/embed/avatars/${i % 6}.png#id=${u.id}" />
-        <div class="Voice_user voice_user">
-          <span class="Voice_name voice_name">User</span>
+        <div class="Voice_user voice_username">
+          <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">User</span>
         </div>
       </li>
     `).join('');
@@ -371,7 +371,7 @@ function renderThemeSelector() {
         }
         
         /* Scale container for mini-preview */
-        ul[class^="Voice_voiceStates"] {
+        ul[class*="Voice_voiceStates"] {
           transform: scale(${theme.previewScale || 0.4}) translateY(${theme.previewTranslateY || 0}px);
         }
         

@@ -4,8 +4,8 @@
 
 export function createSimulator(container) {
   container.innerHTML = `
-    <div class="voice-container">
-      <ul class="Voice_voiceStates voice-states" id="simulator-list">
+    <div class="Voice_voiceContainer voice_container">
+      <ul class="Voice_voiceStates voice_states" id="simulator-list">
         <!-- Injected via state -->
       </ul>
     </div>
@@ -21,10 +21,9 @@ export function updateSimulator(users) {
     const displayName = user.displayName && user.displayName.trim() !== '' ? user.displayName : defaultName;
     return `
       <li class="Voice_voiceState voice_state" data-userid="${user.id}">
-        <div class="metadata">[ID: ${user.id}]</div>
         <img class="Voice_avatar voice_avatar" src="https://cdn.discordapp.com/embed/avatars/${index % 6}.png#id=${user.id}" />
-        <div class="Voice_user voice_user">
-          <span class="Voice_name voice_name">${displayName}</span>
+        <div class="Voice_user voice_username">
+          <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">${displayName}</span>
         </div>
       </li>
     `;

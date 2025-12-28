@@ -20,6 +20,27 @@ A web-based tool for generating custom CSS overlays for Discord StreamKit voice 
 5. Copy or download the generated CSS
 6. Add the CSS file to your streaming software
 
+## Discord StreamKit Overlay Structure
+
+Based on Discord StreamKit voice overlay HTML structure (as of 2025/12/29):
+
+```html
+<div class="Voice_voiceContainer voice_container">
+  <ul class="Voice_voiceStates voice_states">
+    <li class="Voice_voiceState voice_state" data-userid="...">
+      <img class="Voice_avatar voice_avatar" src="..." />
+      <div class="Voice_user voice_username">
+        <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">...</span>
+      </div>
+    </li>
+  </ul>
+</div>
+```
+
+- Classes use CSS Modules with hashes (e.g., `Voice_voiceStates__a121W`)
+- Speaking state adds `Voice_avatarSpeaking__lE+4m` class to img
+- Generated CSS uses `[class*="Voice_*"]` selectors to match hashed classes
+
 ## Development
 
 ```bash

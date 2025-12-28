@@ -22,6 +22,7 @@ img[class*="Voice_avatar"] {
   width: {{avatarSize}}px !important;
   height: {{avatarSize}}px !important;
   border-radius: 50% !important;
+  border: none !important; /* Remove default Discord border to prevent position shift */
   margin-right: 12px !important; /* Space between avatar and name */
   box-shadow: 0 0 0 0px transparent;
   transition: 0.1s;
