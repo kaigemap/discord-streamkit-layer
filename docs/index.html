@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streamkit Overlay Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./overlay/default.css">
+    <script type="module" crossorigin src="./assets/index-nOFENhyI.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DMc4wGAV.css">
+  </head>
+  <body class="dark-theme">
+    <div id="app">
+      <aside class="sidebar">
+        <header class="sidebar-header">
+          <div class="header-main">
+            <h1>Overlay Gen</h1>
+            <span class="version">v1.0.0</span>
+          </div>
+          <div class="lang-switcher">
+            <button class="lang-btn" data-lang="en">EN</button>
+            <button class="lang-btn active" data-lang="ja">JA</button>
+          </div>
+        </header>
+
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" data-sidebar-tab="users" data-i18n="users"><span class="material-symbols-rounded">group</span>メンバーカスタム</button>
+          <button class="sidebar-tab" data-sidebar-tab="general" data-i18n="general"><span class="material-symbols-rounded">palette</span>テーマカスタム</button>
+          <button class="sidebar-tab" data-sidebar-tab="layout" data-i18n="layout"><span class="material-symbols-rounded">view_module</span>レイアウト</button>
+          <button class="sidebar-tab" data-sidebar-tab="css" data-i18n="cssPreview"><span class="material-symbols-rounded">code</span>CSSプレビュー</button>
+        </div>
+
+        <div class="sidebar-content-wrapper">
+          <div class="sidebar-scroll" id="sidebar-tab-general">
+            <div class="group-content">
+              <div class="input-field horizontal">
+                <label for="avatar-size" data-i18n="avatarSize">Avatar Size</label>
+                <div class="dual-input">
+                  <input type="range" id="avatar-size-slider" min="32" max="300" value="100" />
+                  <input type="number" id="avatar-size" value="100" min="32" max="300" />
+                </div>
+              </div>
+              <div class="input-field horizontal">
+                <label for="base-font-size" data-i18n="baseFontSize">Font Size</label>
+                <div class="dual-input">
+                  <input type="range" id="base-font-size-slider" min="8" max="48" value="14" />
+                  <input type="number" id="base-font-size" value="14" min="8" max="48" />
+                </div>
+              </div>
+
+              <div class="input-field horizontal">
+                <label for="hide-names" data-i18n="hideNames">Hide Names</label>
+                <input type="checkbox" id="hide-names" />
+              </div>
+
+              <div class="input-field horizontal">
+                <label for="anim-type" data-i18n="speakingAnimation">Anim</label>
+                <div class="toggle-group" id="anim-type-group">
+                  <button type="button" class="toggle-btn active" data-value="bounce">Bounce</button>
+                  <button type="button" class="toggle-btn" data-value="glow">Glow</button>
+                  <button type="button" class="toggle-btn" data-value="shake">Shake</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-scroll" id="sidebar-tab-layout">
+            <div class="group-content">
+              <div class="input-field horizontal">
+                <label for="layout-gap" data-i18n="spacing">Spacing</label>
+                <div class="dual-input">
+                  <input type="range" id="layout-gap-slider" min="-50" max="200" value="0" />
+                  <input type="number" id="layout-gap" value="0" min="-50" max="200" />
+                </div>
+              </div>
+              <div class="input-field horizontal">
+                <label for="layout-direction" data-i18n="direction">Dir</label>
+                <div class="toggle-group" id="layout-direction-group">
+                  <button type="button" class="toggle-btn active" data-value="row" data-i18n="vertical">Horiz</button>
+                  <button type="button" class="toggle-btn" data-value="column" data-i18n="horizontal">Vert</button>
+                </div>
+              </div>
+              <div class="input-field horizontal">
+                <label for="layout-wrap" data-i18n="wrap">Wrap</label>
+                <div class="toggle-group" id="layout-wrap-group">
+                  <button type="button" class="toggle-btn active" data-value="nowrap" data-i18n="wrapOff">No Wrap</button>
+                  <button type="button" class="toggle-btn" data-value="wrap" data-i18n="wrapOn">Wrap</button>
+                </div>
+              </div>
+              <div class="input-field horizontal">
+                <label for="layout-align" data-i18n="alignment">Align</label>
+                <div class="toggle-group" id="layout-align-group">
+                  <button type="button" class="toggle-btn active" data-value="flex-start" data-i18n="alignStart">Start</button>
+                  <button type="button" class="toggle-btn" data-value="center" data-i18n="alignCenter">Center</button>
+                  <button type="button" class="toggle-btn" data-value="flex-end" data-i18n="alignEnd">End</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-scroll active" id="sidebar-tab-users">
+            <div class="group-content">
+              <div class="settings-toolbar">
+                <div class="toolbar-item grow">
+                  <label class="mini-label" data-i18n="unlistedMembers">Unlisted</label>
+                  <div class="toggle-group" id="unlisted-toggle-group">
+                    <button type="button" class="toggle-btn active" data-value="show" data-i18n="unlistedShow">Show</button>
+                    <button type="button" class="toggle-btn" data-value="hide" data-i18n="unlistedHide">Hide (Whitelist)</button>
+                  </div>
+                </div>
+                <div class="toolbar-item">
+                  <label class="mini-label" data-i18n="defaultColor">Color</label>
+                  <input type="color" id="default-color" value="#ffffff" />
+                </div>
+              </div>
+
+              <div class="inner-group-title" data-i18n="userListHeader">Individual Settings</div>
+              <div class="user-table-header user-table-grid">
+                <span class="header-label" data-i18n="userId">ID</span>
+                <span class="header-label" data-i18n="displayName">Display Name</span>
+                <span class="header-label" data-i18n="priority">Sort</span>
+                <span class="header-label" data-i18n="userColor">Color</span>
+                <span class="header-label"></span>
+              </div>
+              <div id="user-list">
+                <!-- User inputs will be injected here -->
+              </div>
+              <button id="add-user" class="btn btn-secondary btn-sm" data-i18n="addUser">+ Add Member Setting</button>
+            </div>
+          </div>
+
+          <div class="sidebar-scroll" id="sidebar-tab-css">
+            <div class="group-content">
+              <pre id="css-output" class="sidebar-css-preview"></pre>
+            </div>
+          </div>
+        </div> <!-- Close sidebar-content-wrapper -->
+
+        <footer class="sidebar-footer">
+          <div class="footer-group">
+            <div class="footer-group-label" data-i18n="groupCss">CSS</div>
+            <div class="footer-row-icons">
+              <button id="copy-css" class="btn-icon" title="Copy CSS">
+                <span class="material-symbols-rounded">content_copy</span>
+              </button>
+              <button id="download-css" class="btn-icon" title="Download .css">
+                <span class="material-symbols-rounded">download</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="footer-group">
+            <div class="footer-group-label" data-i18n="groupConfig">Settings</div>
+            <div class="footer-row-icons">
+              <button id="export-json" class="btn-icon" title="Save .json">
+                <span class="material-symbols-rounded">save</span>
+              </button>
+              <button id="import-json-btn" class="btn-icon" title="Load .json">
+                <span class="material-symbols-rounded">upload</span>
+              </button>
+            </div>
+            <input type="file" id="import-json-input" accept=".json" style="display: none;" />
+          </div>
+        </footer>
+      </aside>
+
+      <main class="preview-area">
+        <div class="preview-header">
+          <section class="theme-selector-strip">
+            <label class="strip-label" data-i18n="themes">Themes</label>
+            <div class="theme-scroll-container">
+              <div class="theme-grid" id="theme-selector">
+                <!-- Rendered via main.js -->
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="preview-container" id="tab-live">
+          <div class="floating-btn-group">
+            <button id="toggle-debug" class="floating-btn" data-i18n="toggleMetadata">
+              Show IDs
+            </button>
+            <button id="toggle-unset-users" class="floating-btn">
+              Unset Users
+            </button>
+          </div>
+          <div class="preview-inner">
+            <div id="discord-simulator" class="discord-simulator">
+              <!-- Discord UI simulation will be injected here -->
+            </div>
+          </div>
+          <div id="unset-users-control" class="floating-panel hidden">
+            <label for="unset-count" style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; display: block;">Unset User Count</label>
+            <div class="dual-input">
+              <input type="range" id="unset-count-slider" min="0" max="20" value="3" />
+              <input type="number" id="unset-count" value="3" min="0" max="20" />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
