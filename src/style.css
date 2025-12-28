@@ -797,7 +797,7 @@ body.overlay-active .floating-panel {
 /* User Table Grid Layout */
 .user-table-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 45px 30px 56px;
+  grid-template-columns: 30px 1fr 1fr 45px 30px 56px;
   gap: 6px;
   align-items: center;
 }
@@ -832,6 +832,14 @@ body.overlay-active .floating-panel {
   min-width: 0; /* important for grid */
 }
 
+.user-item input[type="text"]:disabled,
+.user-item input[type="number"]:disabled {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 .user-item input[type="color"] {
   width: 100%;
   height: 24px;
@@ -839,6 +847,11 @@ body.overlay-active .floating-panel {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+.user-item input[type="color"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .user-actions {
@@ -858,11 +871,18 @@ body.overlay-active .floating-panel {
   color: var(--danger-color);
 }
 
-.visibility-toggle {
+/* Grid layout specific visibility toggle */
+.user-item .visibility-toggle {
   padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 24px;
 }
 
-.visibility-toggle .material-symbols-rounded {
+.user-item .visibility-toggle .material-symbols-rounded {
   font-size: 16px;
 }
 
@@ -948,6 +968,8 @@ body.overlay-active .floating-panel {
   background-color: rgba(248, 81, 73, 0.25);
   transform: scale(1.05); /* Slight pop to indicate 'click to restore' */
 }
+
+
 
 /* Dim the row when hidden */
 .user-item-hidden {

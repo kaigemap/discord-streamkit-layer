@@ -412,18 +412,17 @@ function renderUserInputs() {
   const sortedUsers = [...state.users].map((user, originalIndex) => ({ ...user, originalIndex })).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
   sortedUsers.forEach((user, sortedIndex) => {
     const div = document.createElement('div');
-    // Add "user-item-hidden" class if the user is in the hide-list
-    div.className = `user-item user-table-grid ${user.isHidden ? 'user-item-hidden' : ''}`;
+    div.className = `user-item user-table-grid`;
     div.innerHTML = `
+      <button class="visibility-toggle ${user.isHidden ? 'hidden' : ''}" data-userid="${user.id}" title="${translations[state.language].visibility}">
+        <span class="material-symbols-rounded">${user.isHidden ? 'visibility_off' : 'visibility'}</span>
+      </button>
       <input type="text" value="${user.id}" data-type="id" data-userid="${user.id}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
-      <input type="text" value="${user.displayName || ''}" data-type="displayName" data-userid="${user.id}" placeholder="上書きする場合のみ入力" title="${translations[state.language].displayName}" />
-      <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-userid="${user.id}" placeholder="0" title="${translations[state.language].priority}" />
-      <input type="color" value="${user.color}" data-type="color" data-userid="${user.id}" title="${translations[state.language].userColor}" />
+      <input type="text" value="${user.displayName || ''}" data-type="displayName" data-userid="${user.id}" placeholder="上書きする場合のみ入力" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
+      <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-userid="${user.id}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
+      <input type="color" value="${user.color}" data-type="color" data-userid="${user.id}" title="${translations[state.language].userColor}" ${user.isHidden ? 'disabled' : ''} />
 
       <div class="user-actions">
-        <button class="visibility-toggle ${user.isHidden ? 'hidden' : ''}" data-userid="${user.id}" title="${translations[state.language].visibility}">
-          <span class="material-symbols-rounded">${user.isHidden ? 'visibility_off' : 'visibility'}</span>
-        </button>
         <span class="remove-user" data-userid="${user.id}">&times;</span>
       </div>
     `;
@@ -467,7 +466,7 @@ function renderUserInputs() {
 
   userListEl.querySelectorAll('.visibility-toggle').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const userId = e.target.dataset.userid;
+      const userId = e.target.dataset.userid || e.target.parentElement.dataset.userid;
       const userIndex = state.users.findIndex(u => u.id === userId);
       if (userIndex === -1) return;
       state.users[userIndex].isHidden = !state.users[userIndex].isHidden;
@@ -559,22 +558,20 @@ function updateUIFromState() {
 }
 
 function applyStyles() {
-  // Create displayed users: unset users + all registered users
+  // Create displayed users: unset users + all registered users (always include for DOM, CSS controls visibility)
   const sortedUsers = [...state.users].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
   const displayedUsers = [...sortedUsers];
-  if (!state.onlyRegistered) {
-    const unsetUsers = [];
-    for (let i = 0; i < state.unsetUserCount; i++) {
-      unsetUsers.push({
-        id: `unset_${i}`,
-        name: `Unset${i+1}`,
-        color: state.defaultColor,
-        priority: 100 + i,
-        isHidden: false
-      });
-    }
-    displayedUsers.push(...unsetUsers);
+  const unsetUsers = [];
+  for (let i = 0; i < state.unsetUserCount; i++) {
+    unsetUsers.push({
+      id: `unset_${i}`,
+      name: `Unset${i+1}`,
+      color: state.defaultColor,
+      priority: 100 + i,
+      isHidden: false
+    });
   }
+  displayedUsers.push(...unsetUsers);
 
   const css = generateCSS(state);
   let styleEl = document.getElementById('generated-styles');
@@ -584,6 +581,20 @@ function applyStyles() {
     document.head.appendChild(styleEl);
   }
   styleEl.textContent = css;
+
+  // Also apply to preview simulator
+  let previewStyleEl = document.getElementById('preview-styles');
+  if (!previewStyleEl) {
+    previewStyleEl = document.createElement('style');
+    previewStyleEl.id = 'preview-styles';
+    const simulator = document.getElementById('discord-simulator');
+    if (simulator) {
+      simulator.appendChild(previewStyleEl);
+    }
+  }
+  if (previewStyleEl) {
+    previewStyleEl.textContent = css;
+  }
 
   const cssOutput = document.getElementById('css-output');
   if (cssOutput) {

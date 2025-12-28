@@ -75,7 +75,7 @@ img[class*="Voice_avatar"] {
 
     // Check per-user visibility (Hide-list)
     if (user.isHidden) {
-      css += `\n/* User ${displayName} is in Hide-list */\nimg[src*="${user.id}"],\nimg[src*="${user.id}"] + div[class^="Voice_user"] {\n  display: none !important;\n}\n`;
+      css += `\n/* User ${displayName} is in Hide-list */\nli[class^="Voice_voiceState"]:has(img[src*="${user.id}"]) {\n  display: none !important;\n}\n`;
       return; // Skip other styles for hidden users
     }
 
@@ -96,6 +96,11 @@ img[class*="Voice_avatar"] {
       css += `li[class^="Voice_voiceState"]:has(img[src*="${user.id}"]) {\n  display: flex !important;\n}\n`;
     }
     css += `${userCSS}\n`;
+
+    // If Solo Mode is ON, explicitly hide unset users
+    if (config.onlyRegistered && user.id.startsWith('unset_')) {
+      css += `li[class^="Voice_voiceState"]:has(img[src*="${user.id}"]) {\n  display: none !important;\n}\n`;
+    }
   });
 
   // Global Name Visibility Control
