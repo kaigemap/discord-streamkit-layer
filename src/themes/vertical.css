@@ -22,8 +22,8 @@ li[class^="Voice_voiceState"] {
 /* Avatar Base Style */
 img[class*="Voice_avatar"] {
   margin-right: 12px;
-  width: {{avatarSize}}px;
-  height: {{avatarSize}}px;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
   border-radius: 50%;
   border: none !important; /* Remove default Discord border to prevent position shift */
   transition: 0.1s;

@@ -376,10 +376,10 @@ function renderThemeSelector() {
         }
         
         /* Theme Structural Styles */
-        ${structuralStyles.replace(/{{avatarSize}}/g, state.avatarSize)}
+        ${structuralStyles}
         
         /* Theme User Styles (Mocked for mini1) */
-        ${perUserStyles.replace(/USER_ID/g, 'mini1').replace(/var\(--user-color\)/g, '#ff4b4b').replace(/var\(--user-color-alpha\)/g, 'rgba(255, 75, 75, 0.4)').replace(/{{avatarSize}}/g, state.avatarSize)}
+        ${perUserStyles.replace(/USER_ID/g, 'mini1').replace(/var\(--user-color\)/g, '#ff4b4b').replace(/var\(--user-color-alpha\)/g, 'rgba(255, 75, 75, 0.4)')}
         
         /* Animation CSS */
         ${getAnimationCSS(state.animType)}

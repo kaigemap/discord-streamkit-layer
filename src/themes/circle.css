@@ -11,14 +11,14 @@ li[class*="Voice_voiceState"] {
   display: block !important;
   margin: 0 !important;
   padding: 0 !important;
-  width: {{avatarSize}}px !important;
-  height: {{avatarSize}}px !important; /* Ensure the li is a square matches the avatar */
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important; /* Ensure the li is a square matches the avatar */
 }
 
 /* Avatar Base Style */
 img[class*="Voice_avatar"] {
-  width: {{avatarSize}}px !important;
-  height: {{avatarSize}}px !important;
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important;
   border-radius: 50% !important;
   border: none !important; /* Remove default Discord border to prevent position shift */
   box-shadow: 0 0 0 4px rgb(160, 160, 160);

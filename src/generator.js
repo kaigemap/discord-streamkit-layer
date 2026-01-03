@@ -24,6 +24,8 @@ body {
 :root {
   --user-color: ${defaultColor} !important;
   --user-color-alpha: ${defaultColorRgba} !important;
+  --avatar-size: ${avatarSize}px !important;
+  --base-font-size: ${baseFontSize}px !important;
 }
 
 /* Global Layout & Sizes */
@@ -41,7 +43,7 @@ ul[class*="Voice_voiceStates"] {
 }
 
 span[class*="Voice_name"] {
-  font-size: ${baseFontSize}px !important;
+  font-size: var(--base-font-size) !important;
   display: block;
 }
 
@@ -51,8 +53,8 @@ li[class*="Voice_voiceState"] {
 }
 
 img[class*="Voice_avatar"] {
-  width: ${avatarSize}px !important;
-  height: ${avatarSize}px !important;
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important;
   margin: 0 !important; /* Reset legacy margins to favor Flex Gap */
 }
 `;
@@ -94,7 +96,7 @@ img[class*="Voice_avatar"] {
       .replace(/{{avatarSize}}/g, avatarSize);
 
     // Always override with displayName
-    userCSS += `\n/* Override custom name */\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: ${baseFontSize}px !important;\n}\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
+    userCSS += `\n/* Override custom name */\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: var(--base-font-size) !important;\n}\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
 
     css += `\n/* User: ${displayName} */\n`;
     // If Solo Mode is ON, we must force-show the registered players

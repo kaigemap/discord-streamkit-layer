@@ -10,8 +10,8 @@ ul[class^="Voice_voiceStates"] {
 /* --- User Base --- */
 li[class^="Voice_voiceState"] {
   position: relative;
-  width: {{avatarSize}}px;
-  height: calc({{avatarSize}}px * 1.33);
+  width: var(--avatar-size);
+  height: calc(var(--avatar-size) * 1.33);
   overflow: hidden;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.5);
