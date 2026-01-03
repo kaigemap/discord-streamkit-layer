@@ -11,14 +11,14 @@ li[class*="Voice_voiceState"] {
   display: block !important;
   margin: 0 !important;
   padding: 0 !important;
-  width: {{avatarSize}}px !important;
-  height: {{avatarSize}}px !important; /* Ensure the li is a square matches the avatar */
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important; /* Ensure the li is a square matches the avatar */
 }
 
 /* Avatar Base Style */
 img[class*="Voice_avatar"] {
-  width: {{avatarSize}}px !important;
-  height: {{avatarSize}}px !important;
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important;
   border-radius: 50% !important;
   border: none !important; /* Remove default Discord border to prevent position shift */
   box-shadow: 0 0 0 4px rgb(160, 160, 160);
@@ -91,8 +91,8 @@ li[class^="Voice_voiceState"] {
 
 /* Avatar Style */
 img[class*="Voice_avatar"] {
-  width: {{avatarSize}}px !important;
-  height: {{avatarSize}}px !important;
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important;
   border-radius: 50% !important;
   border: none !important; /* Remove default Discord border to prevent position shift */
   margin-right: 12px !important; /* Space between avatar and name */
@@ -156,8 +156,8 @@ li[class^="Voice_voiceState"] {
 /* Avatar Base Style */
 img[class*="Voice_avatar"] {
   margin-right: 12px;
-  width: {{avatarSize}}px;
-  height: {{avatarSize}}px;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
   border-radius: 50%;
   border: none !important; /* Remove default Discord border to prevent position shift */
   transition: 0.1s;
@@ -205,8 +205,8 @@ ul[class^="Voice_voiceStates"] {
 /* --- User Base --- */
 li[class^="Voice_voiceState"] {
   position: relative;
-  width: {{avatarSize}}px;
-  height: calc({{avatarSize}}px * 1.33);
+  width: var(--avatar-size);
+  height: calc(var(--avatar-size) * 1.33);
   overflow: hidden;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.5);
@@ -259,7 +259,7 @@ img[src*="USER_ID"][class*="Voice_avatarSpeaking"] {
 li[class^="Voice_voiceState"]:has(img[src*="USER_ID"][class*="Voice_avatarSpeaking"]) {
   box-shadow: 0 0 15px var(--user-color);
 }
-`,I=[{id:"horizontal",name:"Horizontal",icon:"Horizontal",previewScale:.38,previewTranslateY:0,content:P},{id:"circle",name:"Circle",icon:"Circle",previewScale:.38,previewTranslateY:0,content:j,cssPath:"src/themes/circle.css",preview:"/src/assets/themes/circle.png"},{id:"vertical",name:"Vertical",icon:"Vertical",previewScale:.28,previewTranslateY:-10,content:F},{id:"portrait",name:"Portrait",icon:"Portrait",previewScale:.3,previewTranslateY:0,content:G}],u={en:{themes:"Themes",general:"General",layout:"Layout",themeCustom:"Theme Customization",globalSettings:"Size Settings",baseFontSize:"Base Font Size (px)",users:"Member Customization",addUser:"+ Add Member Setting",userId:"Member ID",displayName:"Display Name",userColor:"Color",priority:"Sort",groupCss:"CSS Output",groupConfig:"Settings",cssPreview:"CSS Preview",animations:"Animations",speakingAnimation:"Speaking Animation",copyCss:"Copy CSS",saveCss:"Download .css",saveConfig:"Save .json",loadConfig:"Load .json",labelSave:"Save",labelLoad:"Load",labelConfig:"Config",themeHorizontal:"Horizontal",avatarSize:"Avatar Size",layoutSettings:"Layout Settings",spacing:"Spacing (Gap px)",direction:"Direction",wrap:"Wrapping",alignment:"Alignment (Start)",vertical:"Vertical",horizontal:"Horizontal",wrapOn:"Wrap",wrapOff:"No Wrap",alignStart:"Start",alignCenter:"Center",alignEnd:"End",toggleMetadata:"Show IDs",livePreview:"Live Preview",showAllUsers:"All",showOnlyRegistered:"Reg Only",visibility:"Visibility",hidden:"Hidden",copiedAction:"CSS copied to clipboard!",horizontal:"Circle",vertical:"Vertical",portrait:"Portrait",unlistedMembers:"Unlisted Members",unlistedShow:"Show",unlistedHide:"Hide (Whitelist Mode)",defaultColor:"Default Color",userListHeader:"Individual Settings",colVisibility:"Show?",commonSettings:"Common Settings"},ja:{themes:"テーマ",general:"テーマカスタム",layout:"レイアウト",themeCustom:"テーマカスタム",globalSettings:"サイズ設定",baseFontSize:"フォントサイズ",hideNames:"名前を非表示",users:"メンバーカスタム",addUser:"+ メンバー設定追加",userId:"ユーザーID",displayName:"表示名",userColor:"色",priority:"順序",groupCss:"CSS出力",groupConfig:"設定",cssPreview:"CSSプレビュー",animations:"アニメーション",speakingAnimation:"話し中の動き",copyCss:"CSSをコピー",saveCss:"ファイル保存",saveConfig:"ファイル保存",loadConfig:"ファイル読込",labelSave:"保存",labelLoad:"読込",labelConfig:"設定",themeHorizontal:"横並び",avatarSize:"画像サイズ (px)",layoutSettings:"レイアウト設定",spacing:"間隔 (Gap px)",direction:"並ぶ向き",wrap:"折り返し",alignment:"始点 (揃え)",vertical:"縦",horizontal:"横",wrapOn:"あり",wrapOff:"なし",alignStart:"端 (Start)",alignCenter:"中央 (Center)",alignEnd:"端 (End)",toggleMetadata:"IDを表示",livePreview:"ライブプレビュー",showAllUsers:"全員",showOnlyRegistered:"登録のみ",visibility:"表示設定",hidden:"非表示リスト入り",copiedAction:"CSSをコピーしました！",horizontal:"サークル",vertical:"縦並びリスト",portrait:"ポートレート",unlistedMembers:"未設定のメンバー",unlistedShow:"表示する",unlistedHide:"表示しない (登録者のみ表示)",defaultColor:"未設定メンバーの色",userListHeader:"個別設定リスト",colVisibility:"表示",commonSettings:"共通設定",participantCount:"未設定のメンバーのプレビュー人数"}};function w(t){const{users:e,animType:n,baseFontSize:o,avatarSize:a=100,gap:r=0,direction:s="row",wrap:l="nowrap",justifyContent:m="flex-start",themeId:v="horizontal",defaultColor:S="#ffffff",displayedUsers:R=[]}=t,L=I.find(c=>c.id===v)||I[0],H=V(S,.4);let p=`
+`,I=[{id:"horizontal",name:"Horizontal",icon:"Horizontal",previewScale:.38,previewTranslateY:0,content:P},{id:"circle",name:"Circle",icon:"Circle",previewScale:.38,previewTranslateY:0,content:j,cssPath:"src/themes/circle.css",preview:"/src/assets/themes/circle.png"},{id:"vertical",name:"Vertical",icon:"Vertical",previewScale:.28,previewTranslateY:-10,content:F},{id:"portrait",name:"Portrait",icon:"Portrait",previewScale:.3,previewTranslateY:0,content:G}],u={en:{themes:"Themes",general:"General",layout:"Layout",themeCustom:"Theme Customization",globalSettings:"Size Settings",baseFontSize:"Base Font Size (px)",users:"Member Customization",addUser:"+ Add Member Setting",userId:"Member ID",displayName:"Display Name",userColor:"Color",priority:"Sort",groupCss:"CSS Output",groupConfig:"Settings",cssPreview:"CSS Preview",animations:"Animations",speakingAnimation:"Speaking Animation",copyCss:"Copy CSS",saveCss:"Download .css",saveConfig:"Save .json",loadConfig:"Load .json",labelSave:"Save",labelLoad:"Load",labelConfig:"Config",themeHorizontal:"Horizontal",avatarSize:"Avatar Size",layoutSettings:"Layout Settings",spacing:"Spacing (Gap px)",direction:"Direction",wrap:"Wrapping",alignment:"Alignment (Start)",vertical:"Vertical",horizontal:"Horizontal",wrapOn:"Wrap",wrapOff:"No Wrap",alignStart:"Start",alignCenter:"Center",alignEnd:"End",toggleMetadata:"Show IDs",livePreview:"Live Preview",showAllUsers:"All",showOnlyRegistered:"Reg Only",visibility:"Visibility",hidden:"Hidden",copiedAction:"CSS copied to clipboard!",horizontal:"Circle",vertical:"Vertical",portrait:"Portrait",unlistedMembers:"Unlisted Members",unlistedShow:"Show",unlistedHide:"Hide (Whitelist Mode)",defaultColor:"Default Color",userListHeader:"Individual Settings",colVisibility:"Show?",commonSettings:"Common Settings"},ja:{themes:"テーマ",general:"テーマカスタム",layout:"レイアウト",themeCustom:"テーマカスタム",globalSettings:"サイズ設定",baseFontSize:"フォントサイズ",hideNames:"名前を非表示",users:"メンバーカスタム",addUser:"+ メンバー設定追加",userId:"ユーザーID",displayName:"表示名",userColor:"色",priority:"順序",groupCss:"CSS出力",groupConfig:"設定",cssPreview:"CSSプレビュー",animations:"アニメーション",speakingAnimation:"話し中の動き",copyCss:"CSSをコピー",saveCss:"ファイル保存",saveConfig:"ファイル保存",loadConfig:"ファイル読込",labelSave:"保存",labelLoad:"読込",labelConfig:"設定",themeHorizontal:"横並び",avatarSize:"画像サイズ (px)",layoutSettings:"レイアウト設定",spacing:"間隔 (Gap px)",direction:"並ぶ向き",wrap:"折り返し",alignment:"始点 (揃え)",vertical:"縦",horizontal:"横",wrapOn:"あり",wrapOff:"なし",alignStart:"端 (Start)",alignCenter:"中央 (Center)",alignEnd:"端 (End)",toggleMetadata:"IDを表示",livePreview:"ライブプレビュー",showAllUsers:"全員",showOnlyRegistered:"登録のみ",visibility:"表示設定",hidden:"非表示リスト入り",copiedAction:"CSSをコピーしました！",horizontal:"サークル",vertical:"縦並びリスト",portrait:"ポートレート",unlistedMembers:"未設定のメンバー",unlistedShow:"表示する",unlistedHide:"表示しない (登録者のみ表示)",defaultColor:"未設定メンバーの色",userListHeader:"個別設定リスト",colVisibility:"表示",commonSettings:"共通設定",participantCount:"未設定のメンバーのプレビュー人数"}};function w(t){const{users:e,animType:n,baseFontSize:o,avatarSize:a=100,gap:r=0,direction:s="row",wrap:l="nowrap",justifyContent:m="flex-start",themeId:v="horizontal",defaultColor:b="#ffffff",displayedUsers:R=[]}=t,L=I.find(c=>c.id===v)||I[0],H=z(b,.4);let p=`
 /* --- Discord Streamkit Overlay Generated CSS --- */
 /* Theme: ${L.name} */
 
@@ -271,8 +271,10 @@ body {
 
 /* Global Default Color */
 :root {
-  --user-color: ${S} !important;
+  --user-color: ${b} !important;
   --user-color-alpha: ${H} !important;
+  --avatar-size: ${a}px !important;
+  --base-font-size: ${o}px !important;
 }
 
 /* Global Layout & Sizes */
@@ -290,7 +292,7 @@ ul[class*="Voice_voiceStates"] {
 }
 
 span[class*="Voice_name"] {
-  font-size: ${o}px !important;
+  font-size: var(--base-font-size) !important;
   display: block;
 }
 
@@ -300,8 +302,8 @@ li[class*="Voice_voiceState"] {
 }
 
 img[class*="Voice_avatar"] {
-  width: ${a}px !important;
-  height: ${a}px !important;
+  width: var(--avatar-size) !important;
+  height: var(--avatar-size) !important;
   margin: 0 !important; /* Reset legacy margins to favor Flex Gap */
 }
 `;const[D,O]=L.content.split("/* --- User Highlight --- */");return t.onlyRegistered&&(p+=`
@@ -309,24 +311,24 @@ img[class*="Voice_avatar"] {
 li[class*="Voice_voiceState"] {
   display: none !important;
 }
-`),p+=D.replace(/{{avatarSize}}/g,a),[...R].sort((c,E)=>(c.priority??0)-(E.priority??0)).forEach((c,E)=>{if(!c.id)return;const f=String(c.id).replace(/[^a-zA-Z0-9_]/g,""),M=c.name||`User ${E+1}`,x=c.displayName&&c.displayName.trim()!==""?c.displayName:M;if(c.isHidden){p+=`
-/* User ${x} is in Hide-list */
+`),p+=D.replace(/{{avatarSize}}/g,a),[...R].sort((c,E)=>(c.priority??0)-(E.priority??0)).forEach((c,E)=>{if(!c.id)return;const f=String(c.id).replace(/[^a-zA-Z0-9_]/g,""),M=c.name||`User ${E+1}`,C=c.displayName&&c.displayName.trim()!==""?c.displayName:M;if(c.isHidden){p+=`
+/* User ${C} is in Hide-list */
 li[class*="Voice_voiceState"]:has(img[src*="${f}"]) {
   display: none !important;
 }
-`;return}const q=V(c.color,.4);let k=O.replace(/USER_ID/g,f).replace(/var\(--user-color\)/g,c.color).replace(/var\(--user-color-alpha\)/g,q).replace(/{{avatarSize}}/g,a);k+=`
+`;return}const q=z(c.color,.4);let k=O.replace(/USER_ID/g,f).replace(/var\(--user-color\)/g,c.color).replace(/var\(--user-color-alpha\)/g,q).replace(/{{avatarSize}}/g,a);k+=`
 /* Override custom name */
 img[src*="${f}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {
-  content: "${x}" !important;
+  content: "${C}" !important;
   display: block !important;
-  font-size: ${o}px !important;
+  font-size: var(--base-font-size) !important;
 }
 img[src*="${f}"] + div[class*="Voice_user"] span[class*="Voice_name"] {
   font-size: 0 !important;
   height: auto !important;
 }
 `,p+=`
-/* User: ${x} */
+/* User: ${C} */
 `,t.onlyRegistered&&(p+=`li[class*="Voice_voiceState"]:has(img[src*="${f}"]) {
   display: flex !important;
 }
@@ -339,7 +341,7 @@ img[src*="${f}"] + div[class*="Voice_user"] span[class*="Voice_name"] {
 span[class*="Voice_name"] {
   display: none !important;
 }
-`),p+=N(n),p.trim()}function V(t,e){let n=0,o=0,a=0;return t.length===4?(n=parseInt(t[1]+t[1],16),o=parseInt(t[2]+t[2],16),a=parseInt(t[3]+t[3],16)):t.length===7&&(n=parseInt(t.substring(1,3),16),o=parseInt(t.substring(3,5),16),a=parseInt(t.substring(5,7),16)),`rgba(${n}, ${o}, ${a}, ${e})`}function N(t){switch(t){case"bounce":return`
+`),p+=N(n),p.trim()}function z(t,e){let n=0,o=0,a=0;return t.length===4?(n=parseInt(t[1]+t[1],16),o=parseInt(t[2]+t[2],16),a=parseInt(t[3]+t[3],16)):t.length===7&&(n=parseInt(t.substring(1,3),16),o=parseInt(t.substring(3,5),16),a=parseInt(t.substring(5,7),16)),`rgba(${n}, ${o}, ${a}, ${e})`}function N(t){switch(t){case"bounce":return`
 @keyframes bounce-anim {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -366,9 +368,9 @@ span[class*="Voice_name"] {
           <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">${r}</span>
         </div>
       </li>
-    `}).join(""))}function z(t,e){const n=document.querySelector(`#simulator-list [data-userid="${t}"]`);if(n){const o=n.querySelector(".Voice_avatar");o&&(e?(n.classList.add("wrapper_speaking"),o.classList.add("Voice_avatarSpeaking")):(n.classList.remove("wrapper_speaking"),o.classList.remove("Voice_avatarSpeaking")))}}function J(){const t=document.getElementById("simulator-list");t&&t.classList.toggle("show-metadata")}let i={users:[{id:"12345678901",displayName:"",color:"#ff4b4b",priority:0},{id:"12345678902",displayName:"",color:"#4b4bff",priority:1}],animType:"bounce",baseFontSize:14,avatarSize:100,gap:0,direction:"row",wrap:"nowrap",justifyContent:"flex-start",themeId:"horizontal",language:"ja",onlyRegistered:!1,hideNames:!1,defaultColor:"#ffffff",unsetUserCount:3,displayedUsers:[],isOverlayMode:new URLSearchParams(window.location.search).get("mode")==="overlay"};i.isOverlayMode&&document.body.classList.add("overlay-active");const y=document.getElementById("user-list"),$=document.getElementById("theme-selector"),Z=document.getElementById("discord-simulator");function Q(){X(),K(),ee(),setTimeout(()=>requestAnimationFrame(()=>d()),0)}function X(){U(),A(),_(),g(),Y(Z),T();const t=document.getElementById("toggle-unset-users");t.textContent=`Unset Users (${i.unsetUserCount})`}function K(){te(),ne(),ae(),ie(),oe(),re()}function ee(){function t(){const e=Array.from(document.querySelectorAll("#simulator-list [data-userid]")).map(n=>{const o=n.dataset.userid,a=i.displayedUsers.find(r=>r.id===o);return a&&!a.isHidden?a:null}).filter(Boolean);if(e.length>0){const n=e[Math.floor(Math.random()*e.length)];z(n.id,!0),B(n.id,!0);const o=1200+Math.random()*1800;setTimeout(()=>{z(n.id,!1),B(n.id,!1);const a=400+Math.random()*1e3;setTimeout(t,a)},o)}else setTimeout(t,1e3)}t()}function B(t,e){document.querySelectorAll(".theme-card").forEach(n=>{var a;const o=(a=n.querySelector(".theme-preview-container"))==null?void 0:a.shadowRoot;if(o){const r=o.querySelector('[data-userid="mini1"]'),s=r==null?void 0:r.querySelector(".Voice_avatar");r&&s&&(e?(r.classList.add("wrapper_speaking"),s.classList.add("Voice_avatarSpeaking")):(r.classList.remove("wrapper_speaking"),s.classList.remove("Voice_avatarSpeaking")))}})}function te(){document.getElementById("add-user").addEventListener("click",()=>{i.users.push({id:Date.now().toString(),displayName:"",color:"#ffffff",priority:i.users.length}),g(),d()})}function h(t,e){const n=document.getElementById(t);n&&n.querySelectorAll(".toggle-btn").forEach(o=>{o.addEventListener("click",a=>{n.querySelectorAll(".toggle-btn").forEach(s=>s.classList.remove("active")),a.target.classList.add("active");const r=a.target.dataset.value;i[e]=e==="onlyRegistered"?r==="hide":r,d()})})}function ne(){h("anim-type-group","animType"),h("layout-direction-group","direction"),h("layout-wrap-group","wrap"),h("layout-align-group","justifyContent"),h("unlisted-toggle-group","onlyRegistered")}function b(t,e,n){const o=document.getElementById(t),a=document.getElementById(e),r=s=>{if(i[n]=parseInt(s)||0,o.value=i[n],a.value=i[n],d(),n==="unsetUserCount"){const l=document.getElementById("toggle-unset-users");l.textContent=`Unset Users (${i.unsetUserCount})`}};o.addEventListener("input",s=>r(s.target.value)),a.addEventListener("input",s=>r(s.target.value))}function ae(){b("avatar-size","avatar-size-slider","avatarSize"),b("base-font-size","base-font-size-slider","baseFontSize"),b("layout-gap","layout-gap-slider","gap"),b("unset-count","unset-count-slider","unsetUserCount"),(()=>{const e=document.getElementById("toggle-unset-users");e.textContent=`Unset Users (${i.unsetUserCount})`})(),document.getElementById("hide-names").addEventListener("change",e=>{i.hideNames=e.target.checked,d()})}function ie(){document.querySelectorAll(".lang-btn").forEach(t=>{t.addEventListener("click",e=>{i.language=e.target.dataset.lang,document.querySelectorAll(".lang-btn").forEach(n=>n.classList.remove("active")),e.target.classList.add("active"),U(),A(),_(),g(),d()})})}function oe(){document.querySelectorAll(".sidebar-tab").forEach(t=>{t.addEventListener("click",e=>{const n=e.target.dataset.sidebarTab;document.querySelectorAll(".sidebar-tab").forEach(a=>a.classList.remove("active")),e.target.classList.add("active"),document.querySelectorAll(".sidebar-scroll").forEach(a=>{a.classList.remove("active"),a.style.display="none"});const o=document.getElementById(`sidebar-tab-${n}`);o.classList.add("active"),o.style.display="flex",n==="css"&&(document.getElementById("css-output").textContent=w(i))})})}function re(){document.getElementById("toggle-debug").addEventListener("click",t=>{t.currentTarget.classList.toggle("active"),J()}),document.getElementById("toggle-unset-users").addEventListener("click",()=>{document.getElementById("unset-users-control").classList.toggle("hidden")}),document.getElementById("copy-css").addEventListener("click",()=>{const t=w(i);navigator.clipboard.writeText(t).then(()=>{const e=u[i.language].copiedAction||"Copied!";C(e)})}),document.getElementById("download-css").addEventListener("click",()=>{const t=w(i),e=new Blob([t],{type:"text/css"}),n=URL.createObjectURL(e),o=document.createElement("a");o.href=n,o.download="overlay.css",o.click(),URL.revokeObjectURL(n)}),document.getElementById("export-json").addEventListener("click",()=>{const t=new Blob([JSON.stringify(i,null,2)],{type:"application/json"}),e=URL.createObjectURL(t),n=document.createElement("a");n.setAttribute("href",e),n.setAttribute("download","overlay-config.json"),document.body.appendChild(n),n.click(),n.remove(),URL.revokeObjectURL(e)}),document.getElementById("import-json-btn").addEventListener("click",()=>{document.getElementById("import-json-input").click()}),document.getElementById("import-json-input").addEventListener("change",t=>{const e=t.target.files[0];if(!e){console.log("No file selected");return}const n=new FileReader;n.onload=o=>{try{console.log("File loaded, parsing JSON...");const a=JSON.parse(o.target.result);console.log("Parsed config:",a),i={...i,...a},console.log("State updated:",i),U(),T(),d(),_(),g(),C(u[i.language].loadConfig+" OK")}catch(a){console.error("JSON parse error:",a),C("Invalid JSON: "+a.message)}},n.readAsText(e),t.target.value=""})}function C(t){const e=document.createElement("div");e.className="notification",e.textContent=t,document.body.appendChild(e),setTimeout(()=>e.classList.add("show"),10),setTimeout(()=>{e.classList.remove("show"),setTimeout(()=>e.remove(),300)},2e3)}function _(){$.innerHTML="",I.forEach(t=>{const e=document.createElement("button");e.className=`theme-card ${i.themeId===t.id?"active":""}`,e.dataset.theme=t.id;const n=document.createElement("div");n.className="theme-preview-container";const o=n.attachShadow({mode:"open"}),r=[{id:"mini1",color:"#ff4b4b"}].map((v,S)=>`
+    `}).join(""))}function V(t,e){const n=document.querySelector(`#simulator-list [data-userid="${t}"]`);if(n){const o=n.querySelector(".Voice_avatar");o&&(e?(n.classList.add("wrapper_speaking"),o.classList.add("Voice_avatarSpeaking")):(n.classList.remove("wrapper_speaking"),o.classList.remove("Voice_avatarSpeaking")))}}function J(){const t=document.getElementById("simulator-list");t&&t.classList.toggle("show-metadata")}let i={users:[{id:"12345678901",displayName:"",color:"#ff4b4b",priority:0},{id:"12345678902",displayName:"",color:"#4b4bff",priority:1}],animType:"bounce",baseFontSize:14,avatarSize:100,gap:0,direction:"row",wrap:"nowrap",justifyContent:"flex-start",themeId:"horizontal",language:"ja",onlyRegistered:!1,hideNames:!1,defaultColor:"#ffffff",unsetUserCount:3,displayedUsers:[],isOverlayMode:new URLSearchParams(window.location.search).get("mode")==="overlay"};i.isOverlayMode&&document.body.classList.add("overlay-active");const y=document.getElementById("user-list"),$=document.getElementById("theme-selector"),Z=document.getElementById("discord-simulator");function Q(){X(),K(),ee(),setTimeout(()=>requestAnimationFrame(()=>d()),0)}function X(){U(),A(),_(),g(),Y(Z),T();const t=document.getElementById("toggle-unset-users");t.textContent=`Unset Users (${i.unsetUserCount})`}function K(){te(),ne(),ae(),ie(),oe(),re()}function ee(){function t(){const e=Array.from(document.querySelectorAll("#simulator-list [data-userid]")).map(n=>{const o=n.dataset.userid,a=i.displayedUsers.find(r=>r.id===o);return a&&!a.isHidden?a:null}).filter(Boolean);if(e.length>0){const n=e[Math.floor(Math.random()*e.length)];V(n.id,!0),B(n.id,!0);const o=1200+Math.random()*1800;setTimeout(()=>{V(n.id,!1),B(n.id,!1);const a=400+Math.random()*1e3;setTimeout(t,a)},o)}else setTimeout(t,1e3)}t()}function B(t,e){document.querySelectorAll(".theme-card").forEach(n=>{var a;const o=(a=n.querySelector(".theme-preview-container"))==null?void 0:a.shadowRoot;if(o){const r=o.querySelector('[data-userid="mini1"]'),s=r==null?void 0:r.querySelector(".Voice_avatar");r&&s&&(e?(r.classList.add("wrapper_speaking"),s.classList.add("Voice_avatarSpeaking")):(r.classList.remove("wrapper_speaking"),s.classList.remove("Voice_avatarSpeaking")))}})}function te(){document.getElementById("add-user").addEventListener("click",()=>{i.users.push({id:Date.now().toString(),displayName:"",color:"#ffffff",priority:i.users.length}),g(),d()})}function h(t,e){const n=document.getElementById(t);n&&n.querySelectorAll(".toggle-btn").forEach(o=>{o.addEventListener("click",a=>{n.querySelectorAll(".toggle-btn").forEach(s=>s.classList.remove("active")),a.target.classList.add("active");const r=a.target.dataset.value;i[e]=e==="onlyRegistered"?r==="hide":r,d()})})}function ne(){h("anim-type-group","animType"),h("layout-direction-group","direction"),h("layout-wrap-group","wrap"),h("layout-align-group","justifyContent"),h("unlisted-toggle-group","onlyRegistered")}function S(t,e,n){const o=document.getElementById(t),a=document.getElementById(e),r=s=>{if(i[n]=parseInt(s)||0,o.value=i[n],a.value=i[n],d(),n==="unsetUserCount"){const l=document.getElementById("toggle-unset-users");l.textContent=`Unset Users (${i.unsetUserCount})`}};o.addEventListener("input",s=>r(s.target.value)),a.addEventListener("input",s=>r(s.target.value))}function ae(){S("avatar-size","avatar-size-slider","avatarSize"),S("base-font-size","base-font-size-slider","baseFontSize"),S("layout-gap","layout-gap-slider","gap"),S("unset-count","unset-count-slider","unsetUserCount"),(()=>{const e=document.getElementById("toggle-unset-users");e.textContent=`Unset Users (${i.unsetUserCount})`})(),document.getElementById("hide-names").addEventListener("change",e=>{i.hideNames=e.target.checked,d()})}function ie(){document.querySelectorAll(".lang-btn").forEach(t=>{t.addEventListener("click",e=>{i.language=e.target.dataset.lang,document.querySelectorAll(".lang-btn").forEach(n=>n.classList.remove("active")),e.target.classList.add("active"),U(),A(),_(),g(),d()})})}function oe(){document.querySelectorAll(".sidebar-tab").forEach(t=>{t.addEventListener("click",e=>{const n=e.target.dataset.sidebarTab;document.querySelectorAll(".sidebar-tab").forEach(a=>a.classList.remove("active")),e.target.classList.add("active"),document.querySelectorAll(".sidebar-scroll").forEach(a=>{a.classList.remove("active"),a.style.display="none"});const o=document.getElementById(`sidebar-tab-${n}`);o.classList.add("active"),o.style.display="flex",n==="css"&&(document.getElementById("css-output").textContent=w(i))})})}function re(){document.getElementById("toggle-debug").addEventListener("click",t=>{t.currentTarget.classList.toggle("active"),J()}),document.getElementById("toggle-unset-users").addEventListener("click",()=>{document.getElementById("unset-users-control").classList.toggle("hidden")}),document.getElementById("copy-css").addEventListener("click",()=>{const t=w(i);navigator.clipboard.writeText(t).then(()=>{const e=u[i.language].copiedAction||"Copied!";x(e)})}),document.getElementById("download-css").addEventListener("click",()=>{const t=w(i),e=new Blob([t],{type:"text/css"}),n=URL.createObjectURL(e),o=document.createElement("a");o.href=n,o.download="overlay.css",o.click(),URL.revokeObjectURL(n)}),document.getElementById("export-json").addEventListener("click",()=>{const t=new Blob([JSON.stringify(i,null,2)],{type:"application/json"}),e=URL.createObjectURL(t),n=document.createElement("a");n.setAttribute("href",e),n.setAttribute("download","overlay-config.json"),document.body.appendChild(n),n.click(),n.remove(),URL.revokeObjectURL(e)}),document.getElementById("import-json-btn").addEventListener("click",()=>{document.getElementById("import-json-input").click()}),document.getElementById("import-json-input").addEventListener("change",t=>{const e=t.target.files[0];if(!e){console.log("No file selected");return}const n=new FileReader;n.onload=o=>{try{console.log("File loaded, parsing JSON...");const a=JSON.parse(o.target.result);console.log("Parsed config:",a),i={...i,...a},console.log("State updated:",i),U(),T(),d(),_(),g(),x(u[i.language].loadConfig+" OK")}catch(a){console.error("JSON parse error:",a),x("Invalid JSON: "+a.message)}},n.readAsText(e),t.target.value=""})}function x(t){const e=document.createElement("div");e.className="notification",e.textContent=t,document.body.appendChild(e),setTimeout(()=>e.classList.add("show"),10),setTimeout(()=>{e.classList.remove("show"),setTimeout(()=>e.remove(),300)},2e3)}function _(){$.innerHTML="",I.forEach(t=>{const e=document.createElement("button");e.className=`theme-card ${i.themeId===t.id?"active":""}`,e.dataset.theme=t.id;const n=document.createElement("div");n.className="theme-preview-container";const o=n.attachShadow({mode:"open"}),r=[{id:"mini1",color:"#ff4b4b"}].map((v,b)=>`
       <li class="Voice_voiceState voice_state" data-userid="${v.id}">
-        <img class="Voice_avatar voice_avatar Voice_avatarSpeaking" src="https://cdn.discordapp.com/embed/avatars/${S%6}.png#id=${v.id}" />
+        <img class="Voice_avatar voice_avatar Voice_avatarSpeaking" src="https://cdn.discordapp.com/embed/avatars/${b%6}.png#id=${v.id}" />
         <div class="Voice_user voice_username">
           <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">User</span>
         </div>
@@ -391,10 +393,10 @@ span[class*="Voice_name"] {
         }
         
         /* Theme Structural Styles */
-        ${s.replace(/{{avatarSize}}/g,i.avatarSize)}
+        ${s}
         
         /* Theme User Styles (Mocked for mini1) */
-        ${l.replace(/USER_ID/g,"mini1").replace(/var\(--user-color\)/g,"#ff4b4b").replace(/var\(--user-color-alpha\)/g,"rgba(255, 75, 75, 0.4)").replace(/{{avatarSize}}/g,i.avatarSize)}
+        ${l.replace(/USER_ID/g,"mini1").replace(/var\(--user-color\)/g,"#ff4b4b").replace(/var\(--user-color-alpha\)/g,"rgba(255, 75, 75, 0.4)")}
         
         /* Animation CSS */
         ${N(i.animType)}
