@@ -797,8 +797,8 @@ body.overlay-active .floating-panel {
 /* User Table Grid Layout */
 .user-table-grid {
   display: grid;
-  grid-template-columns: 30px 1fr 1fr 45px 30px 56px;
-  gap: 6px;
+  grid-template-columns: 30px 1fr 1fr 120px 45px 30px 56px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -1026,4 +1026,46 @@ body.overlay-active .floating-panel {
 .notification.show {
   transform: translateY(0);
   opacity: 1;
+}
+
+/* Avatar Override Styles */
+.avatar-input-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+}
+
+.avatar-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.btn-upload {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-upload:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.avatar-url-input {
+  flex-grow: 1;
+  min-width: 0;
+  padding: 4px 6px !important;
 }

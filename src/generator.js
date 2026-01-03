@@ -98,6 +98,13 @@ img[class*="Voice_avatar"] {
     // Always override with displayName
     userCSS += `\n/* Override custom name */\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: var(--base-font-size) !important;\n}\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
 
+    // Avatar Override
+    if (user.avatarUrl) {
+      // Append #id=... to the URL so that img[src*="ID"] selector still matches
+      const urlWithId = user.avatarUrl.includes('#id=') ? user.avatarUrl : `${user.avatarUrl}#id=${safeUserId}`;
+      userCSS += `\n/* Override Avatar */\nimg[src*="${safeUserId}"] {\n  content: url("${urlWithId}") !important;\n  object-fit: cover !important;\n}\n`;
+    }
+
     css += `\n/* User: ${displayName} */\n`;
     // If Solo Mode is ON, we must force-show the registered players
     if (config.onlyRegistered) {

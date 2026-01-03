@@ -7,8 +7,8 @@ import { createSimulator, updateSimulator, setSpeaking, toggleMetadata } from '.
 
 let state = {
   users: [
-    { id: '12345678901', displayName: '', color: '#ff4b4b', priority: 0 },
-    { id: '12345678902', displayName: '', color: '#4b4bff', priority: 1 }
+    { id: '12345678901', displayName: '', avatarUrl: '', color: '#ff4b4b', priority: 0 },
+    { id: '12345678902', displayName: '', avatarUrl: '', color: '#4b4bff', priority: 1 }
   ],
   animType: 'bounce',
   baseFontSize: 14,
@@ -116,11 +116,42 @@ function setupUserManagementListeners() {
     state.users.push({
       id: Date.now().toString(),
       displayName: '',
+      avatarUrl: '', // Initialized
       color: '#ffffff',
       priority: state.users.length
     });
     renderUserInputs();
     applyStyles();
+  });
+
+  // Handle Avatar Image Upload
+  const avatarUploadBase = document.getElementById('avatar-upload-base');
+  let activeUploadingUserId = null;
+
+  userListEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-upload');
+    if (btn) {
+      activeUploadingUserId = btn.dataset.userid;
+      avatarUploadBase.click();
+    }
+  });
+
+  avatarUploadBase.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && activeUploadingUserId) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Data = event.target.result;
+        const userIndex = state.users.findIndex(u => u.id === activeUploadingUserId);
+        if (userIndex !== -1) {
+          state.users[userIndex].avatarUrl = base64Data;
+          renderUserInputs();
+          applyStyles();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = ''; // Reset for same-file selection
   });
 }
 
@@ -419,6 +450,15 @@ function renderUserInputs() {
       </button>
       <input type="text" value="${user.id}" data-type="id" data-userid="${user.id}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
       <input type="text" value="${user.displayName || ''}" data-type="displayName" data-userid="${user.id}" placeholder="上書きする場合のみ入力" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
+      
+      <div class="avatar-input-container">
+        <img src="${user.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="avatar-preview" id="preview-${user.id}" />
+        <input type="text" value="${user.avatarUrl || ''}" data-type="avatarUrl" data-userid="${user.id}" class="avatar-url-input" placeholder="URL / DataURI" title="${translations[state.language].avatarOverride}" ${user.isHidden ? 'disabled' : ''} />
+        <button class="btn-upload" data-userid="${user.id}" title="Upload Image" ${user.isHidden ? 'disabled' : ''}>
+          <span class="material-symbols-rounded" style="font-size: 16px;">upload_file</span>
+        </button>
+      </div>
+
       <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-userid="${user.id}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
       <input type="color" value="${user.color}" data-type="color" data-userid="${user.id}" title="${translations[state.language].userColor}" ${user.isHidden ? 'disabled' : ''} />
 
@@ -443,6 +483,12 @@ function renderUserInputs() {
       }
       
       state.users[userIndex][type] = value;
+      
+      // Real-time preview update for Avatar URL
+      if (type === 'avatarUrl') {
+        const preview = document.getElementById(`preview-${userId}`);
+        if (preview) preview.src = value || 'https://cdn.discordapp.com/embed/avatars/0.png';
+      }
       
       // If priority changed, we might want to re-render to show new order
       if (type === 'priority') {

@@ -19,9 +19,12 @@ export function updateSimulator(users) {
   list.innerHTML = users.map((user, index) => {
     const defaultName = user.name || `User ${index + 1}`;
     const displayName = user.displayName && user.displayName.trim() !== '' ? user.displayName : defaultName;
+    const avatarSrc = user.avatarUrl 
+      ? (user.avatarUrl.includes('#id=') ? user.avatarUrl : `${user.avatarUrl}#id=${user.id}`)
+      : `https://cdn.discordapp.com/embed/avatars/${index % 6}.png#id=${user.id}`;
     return `
       <li class="Voice_voiceState voice_state" data-userid="${user.id}">
-        <img class="Voice_avatar voice_avatar" src="https://cdn.discordapp.com/embed/avatars/${index % 6}.png#id=${user.id}" />
+        <img class="Voice_avatar voice_avatar" src="${avatarSrc}" style="object-fit: cover;" />
         <div class="Voice_user voice_username">
           <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">${displayName}</span>
         </div>
