@@ -17,13 +17,17 @@ let state = {
   direction: 'row',
   wrap: 'nowrap',
   justifyContent: 'flex-start',
-  themeId: 'horizontal',
+  themeId: 'circle',
   language: 'ja',
   onlyRegistered: false,
   hideNames: false,
   defaultColor: '#ffffff', // Added default color
   unsetUserCount: 3, // Unset user count
   displayedUsers: [], // For speaking simulation
+  padding: 20, // Container padding
+  borderRadius: 0, // Container border radius
+  backgroundColor: 'rgba(0, 0, 0, 0)', // Container background
+  nameBackgroundColor: 'rgba(30, 33, 36, 0.95)', // Name background
   isOverlayMode: new URLSearchParams(window.location.search).get('mode') === 'overlay'
 };
 
@@ -38,8 +42,8 @@ const simulatorEl = document.getElementById('discord-simulator');
 function init() {
   initializeUI();
   setupEventListeners();
+  applyStyles();
   startSpeakingSimulation();
-  setTimeout(() => requestAnimationFrame(() => applyStyles()), 0);
 }
 
 function initializeUI() {
@@ -165,6 +169,7 @@ function setupToggleGroup(groupId, stateKey) {
       e.target.classList.add('active');
       const value = e.target.dataset.value;
       state[stateKey] = stateKey === 'onlyRegistered' ? value === 'hide' : value;
+      console.log('toggle clicked', groupId, value, 'stateKey', stateKey, 'new state value', state[stateKey]);
       applyStyles();
     });
   });
@@ -200,6 +205,8 @@ function syncDualInput(id, sliderId, stateKey) {
 function setupInputSyncListeners() {
   syncDualInput('avatar-size', 'avatar-size-slider', 'avatarSize');
   syncDualInput('base-font-size', 'base-font-size-slider', 'baseFontSize');
+  syncDualInput('container-padding', 'container-padding-slider', 'padding');
+  syncDualInput('border-radius', 'border-radius-slider', 'borderRadius');
   syncDualInput('layout-gap', 'layout-gap-slider', 'gap');
   syncDualInput('unset-count', 'unset-count-slider', 'unsetUserCount');
 
@@ -213,6 +220,20 @@ function setupInputSyncListeners() {
   // Override update to also update button
   const originalUpdate = syncDualInput;
   // Wait, better to add after syncDualInput
+
+  document.getElementById('background-color').addEventListener('input', (e) => {
+    state.backgroundColor = e.target.value === '#000000' ? 'rgba(0, 0, 0, 0)' : e.target.value;
+    applyStyles();
+  });
+
+  document.getElementById('name-background-color').addEventListener('input', (e) => {
+    const hex = e.target.value;
+    const r = parseInt(hex.substring(1, 3), 16);
+    const g = parseInt(hex.substring(3, 5), 16);
+    const b = parseInt(hex.substring(5, 7), 16);
+    state.nameBackgroundColor = `rgba(${r}, ${g}, ${b}, 0.95)`;
+    applyStyles();
+  });
 
   document.getElementById('hide-names').addEventListener('change', (e) => {
     state.hideNames = e.target.checked;
@@ -553,6 +574,10 @@ function updateUIFromState() {
   document.getElementById('avatar-size-slider').value = state.avatarSize;
   document.getElementById('base-font-size').value = state.baseFontSize;
   document.getElementById('base-font-size-slider').value = state.baseFontSize;
+  document.getElementById('container-padding').value = state.padding;
+  document.getElementById('container-padding-slider').value = state.padding;
+  document.getElementById('border-radius').value = state.borderRadius;
+  document.getElementById('border-radius-slider').value = state.borderRadius;
   // Sync Layout Settings
   document.getElementById('layout-gap').value = state.gap;
   document.getElementById('layout-gap-slider').value = state.gap;
@@ -618,6 +643,8 @@ function applyStyles() {
     });
   }
   displayedUsers.push(...unsetUsers);
+  console.log('applyStyles: displayedUsers length:', displayedUsers.length, 'unsetUsers length:', unsetUsers.length, 'onlyRegistered:', state.onlyRegistered);
+  console.log('state:', state);
 
   const css = generateCSS(state);
   let styleEl = document.getElementById('generated-styles');

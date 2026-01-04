@@ -4,12 +4,14 @@ export function generateCSS(config) {
   const {
     users, animType, baseFontSize, avatarSize = 100,
     gap = 0, direction = 'row', wrap = 'nowrap', justifyContent = 'flex-start',
-    themeId = 'horizontal', defaultColor = '#ffffff', displayedUsers = []
+    themeId = 'horizontal', defaultColor = '#ffffff', displayedUsers = [],
+    padding = 20, borderRadius = 0, backgroundColor = 'rgba(0, 0, 0, 0)', nameBackgroundColor = 'rgba(30, 33, 36, 0.95)'
   } = config;
   const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
 
   const defaultColorRgba = hexToRgba(defaultColor, 0.4);
 
+  // Add global styles and theme content
   let css = `
 /* --- Discord Streamkit Overlay Generated CSS --- */
 /* Theme: ${theme.name} */
@@ -26,6 +28,10 @@ body {
   --user-color-alpha: ${defaultColorRgba} !important;
   --avatar-size: ${avatarSize}px !important;
   --base-font-size: ${baseFontSize}px !important;
+  --container-padding: ${padding}px !important;
+  --container-border-radius: ${borderRadius}px !important;
+  --container-background-color: ${backgroundColor} !important;
+  --name-background-color: ${nameBackgroundColor} !important;
 }
 
 /* Global Layout & Sizes */
@@ -39,7 +45,7 @@ ul[class*="Voice_voiceStates"] {
   height: auto !important;
   margin-left: 10px !important;
   margin-top: 10px !important;
-  padding: 20px !important; /* Padding for animation overflow in OBS */
+  padding: var(--container-padding) !important; /* Padding for animation overflow in OBS */
 }
 
 span[class*="Voice_name"] {
@@ -57,17 +63,20 @@ img[class*="Voice_avatar"] {
   height: var(--avatar-size) !important;
   margin: 0 !important; /* Reset legacy margins to favor Flex Gap */
 }
-`;
+` + theme.content;
 
-  // Get the core theme body
-  const [structuralStyles, perUserStyles] = theme.content.split('/* --- User Highlight --- */');
+  // Split theme content for per-user styles (after global styles)
+  const globalAndTheme = css;
+  const parts = globalAndTheme.split('/* --- User Highlight --- */');
+  let structuralStyles = parts[0];
+  const perUserStyles = parts[1] || '';
 
   // If Solo-mode is ON, hide everyone by default
   if (config.onlyRegistered) {
-    css += `\n/* Solo Mode: Hide all by default */\nli[class*="Voice_voiceState"] {\n  display: none !important;\n}\n`;
+    css = structuralStyles + `\n/* Solo Mode: Hide all by default */\nli[class*="Voice_voiceState"] {\n  display: none !important;\n}\n` + perUserStyles;
+  } else {
+    css = structuralStyles + perUserStyles;
   }
-
-  css += structuralStyles.replace(/{{avatarSize}}/g, avatarSize);
 
   // Use displayedUsers instead of just registered users to include unset users
   const sortedDisplayedUsers = [...displayedUsers].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));

@@ -15,11 +15,12 @@ export function createSimulator(container) {
 export function updateSimulator(users) {
   const list = document.getElementById('simulator-list');
   if (!list) return;
+  console.log('updateSimulator: users length:', users.length);
 
   list.innerHTML = users.map((user, index) => {
     const defaultName = user.name || `User ${index + 1}`;
     const displayName = user.displayName && user.displayName.trim() !== '' ? user.displayName : defaultName;
-    const avatarSrc = user.avatarUrl 
+    const avatarSrc = user.avatarUrl
       ? (user.avatarUrl.includes('#id=') ? user.avatarUrl : `${user.avatarUrl}#id=${user.id}`)
       : `https://cdn.discordapp.com/embed/avatars/${index % 6}.png#id=${user.id}`;
     return `
@@ -31,6 +32,7 @@ export function updateSimulator(users) {
       </li>
     `;
   }).join('');
+  console.log('li count:', document.querySelectorAll('#simulator-list li').length);
 }
 
 export function setSpeaking(userId, isSpeaking) {

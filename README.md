@@ -7,6 +7,7 @@ A web-based tool for generating custom CSS overlays for Discord StreamKit voice 
 - **Customizable Themes**: Choose from multiple predefined themes
 - **Individual User Settings**: Configure display names, colors, and priorities for each user
 - **Visibility Controls**: Hide/show individual users or restrict to registered users only
+- **Unset User Count**: Adjust the number of placeholder unset users for simulation and preview
 - **Layout Options**: Control spacing, direction, wrapping, and alignment
 - **Real-time Preview**: See changes instantly in the Discord simulator
 - **CSS Export**: Generate and download overlay CSS for use with OBS or StreamLabs
