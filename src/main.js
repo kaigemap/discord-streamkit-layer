@@ -28,6 +28,8 @@ let state = {
   borderRadius: 0, // Container border radius
   backgroundColor: 'rgba(0, 0, 0, 0)', // Container background
   nameBackgroundColor: 'rgba(30, 33, 36, 0.95)', // Name background
+  shadowEnabled: true, // Enable/disable shadow effect
+  themeAnimations: {}, // Theme-specific speaking animations
   isOverlayMode: new URLSearchParams(window.location.search).get('mode') === 'overlay'
 };
 
@@ -50,6 +52,7 @@ function initializeUI() {
   updateLanguageUI();
   updateButtonTitles();
   renderThemeSelector();
+  renderThemeAnimationSettings();
   renderUserInputs();
   createSimulator(simulatorEl);
   updateUIFromState();
@@ -168,7 +171,11 @@ function setupToggleGroup(groupId, stateKey) {
       group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       e.target.classList.add('active');
       const value = e.target.dataset.value;
-      state[stateKey] = stateKey === 'onlyRegistered' ? value === 'hide' : value;
+      if (stateKey === 'shadowEnabled') {
+        state[stateKey] = value === 'true';
+      } else {
+        state[stateKey] = stateKey === 'onlyRegistered' ? value === 'hide' : value;
+      }
       console.log('toggle clicked', groupId, value, 'stateKey', stateKey, 'new state value', state[stateKey]);
       applyStyles();
     });
@@ -181,6 +188,7 @@ function setupToggleGroupListeners() {
   setupToggleGroup('layout-wrap-group', 'wrap');
   setupToggleGroup('layout-align-group', 'justifyContent');
   setupToggleGroup('unlisted-toggle-group', 'onlyRegistered');
+  setupToggleGroup('shadow-enabled-group', 'shadowEnabled');
 }
 
 function syncDualInput(id, sliderId, stateKey) {
@@ -375,6 +383,47 @@ function showNotification(msg) {
   }, 2000);
 }
 
+function renderThemeAnimationSettings() {
+  const container = document.getElementById('theme-animation-settings');
+  if (!container) return;
+
+  const theme = THEMES.find(t => t.id === state.themeId);
+  if (!theme) return;
+
+  const currentAnimations = state.themeAnimations[state.themeId] || theme.speakingAnimations || { bounce: true, glow: false, shake: false };
+
+  container.innerHTML = `
+    <div class="inner-group-title">テーマ固有のアニメーション設定</div>
+    <div class="animation-settings">
+      <label class="checkbox-label">
+        <input type="checkbox" data-animation="bounce" ${currentAnimations.bounce ? 'checked' : ''} />
+        Bounce (跳ねる)
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" data-animation="glow" ${currentAnimations.glow ? 'checked' : ''} />
+        Glow (輝く)
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" data-animation="shake" ${currentAnimations.shake ? 'checked' : ''} />
+        Shake (揺れる)
+      </label>
+    </div>
+  `;
+
+  // Add event listeners
+  container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const animationType = e.target.dataset.animation;
+      if (!state.themeAnimations[state.themeId]) {
+        state.themeAnimations[state.themeId] = { ...currentAnimations };
+      }
+      state.themeAnimations[state.themeId][animationType] = e.target.checked;
+      renderThemeSelector(); // Update previews
+      applyStyles();
+    });
+  });
+}
+
 function renderThemeSelector() {
   themeSelectorEl.innerHTML = ''; // Clear
   
@@ -406,9 +455,20 @@ function renderThemeSelector() {
     `).join('');
 
 
-    const [structuralStyles, perUserStyles] = theme.content.includes('/* --- User Highlight --- */') 
+    const [structuralStyles, perUserStyles] = theme.content.includes('/* --- User Highlight --- */')
       ? theme.content.split('/* --- User Highlight --- */')
       : [theme.content, ''];
+
+    const speakingAnimations = state.themeAnimations[theme.id] || theme.speakingAnimations || { bounce: true };
+    const enabledAnimations = Object.keys(speakingAnimations).filter(key => speakingAnimations[key]);
+
+    let themeStructuralStyles = structuralStyles;
+    if (enabledAnimations.length > 0) {
+      const animationValue = enabledAnimations.map(anim => `${anim}-anim 0.6s infinite`).join(', ');
+      themeStructuralStyles = structuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, `animation: ${animationValue}`);
+    } else {
+      themeStructuralStyles = structuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, 'animation: none');
+    }
 
     shadow.innerHTML = `
       <style>
@@ -421,20 +481,20 @@ function renderThemeSelector() {
           overflow: hidden;
           background-color: #0b0d10;
         }
-        
+
         /* Scale container for mini-preview */
         ul[class*="Voice_voiceStates"] {
           transform: scale(${theme.previewScale || 0.4}) translateY(${theme.previewTranslateY || 0}px);
         }
-        
+
         /* Theme Structural Styles */
-        ${structuralStyles}
-        
+        ${themeStructuralStyles}
+
         /* Theme User Styles (Mocked for mini1) */
         ${perUserStyles.replace(/USER_ID/g, 'mini1').replace(/var\(--user-color\)/g, '#ff4b4b').replace(/var\(--user-color-alpha\)/g, 'rgba(255, 75, 75, 0.4)')}
-        
+
         /* Animation CSS */
-        ${getAnimationCSS(state.animType)}
+        ${getAnimationCSS(speakingAnimations)}
       </style>
       <ul class="Voice_voiceStates voice-states">
         ${userHtml}
@@ -452,6 +512,7 @@ function renderThemeSelector() {
       state.themeId = theme.id;
       document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
+      renderThemeAnimationSettings();
       applyStyles();
     });
     
@@ -599,6 +660,7 @@ function updateUIFromState() {
   syncToggleGroup('layout-direction-group', state.direction);
   syncToggleGroup('layout-wrap-group', state.wrap);
   syncToggleGroup('layout-align-group', state.justifyContent);
+  syncToggleGroup('shadow-enabled-group', state.shadowEnabled ? 'true' : 'false');
 
   document.getElementById('hide-names').checked = state.hideNames;
   

@@ -64,6 +64,7 @@ export const translations = {
     themeCustom: 'テーマカスタム',
     globalSettings: 'サイズ設定',
     baseFontSize: 'フォントサイズ',
+    borderRadius: '角丸',
     hideNames: '名前を非表示',
     users: 'メンバーカスタム',
     addUser: '+ メンバー設定追加',

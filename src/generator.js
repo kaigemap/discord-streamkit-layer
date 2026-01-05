@@ -5,13 +5,31 @@ export function generateCSS(config) {
     users, animType, baseFontSize, avatarSize = 100,
     gap = 0, direction = 'row', wrap = 'nowrap', justifyContent = 'flex-start',
     themeId = 'horizontal', defaultColor = '#ffffff', displayedUsers = [],
-    padding = 20, borderRadius = 0, backgroundColor = 'rgba(0, 0, 0, 0)', nameBackgroundColor = 'rgba(30, 33, 36, 0.95)'
+    padding = 20, borderRadius = 0, backgroundColor = 'rgba(0, 0, 0, 0)', nameBackgroundColor = 'rgba(30, 33, 36, 0.95)',
+    shadowEnabled = true, themeAnimations = {}
   } = config;
   const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+  const speakingAnimations = themeAnimations[themeId] || theme.speakingAnimations || { bounce: true };
 
   const defaultColorRgba = hexToRgba(defaultColor, 0.4);
 
   // Add global styles and theme content
+  let themeContent = theme.content;
+  if (!shadowEnabled) {
+    // Replace box-shadow with none when shadow is disabled
+    themeContent = themeContent.replace(/box-shadow\s*:\s*[^;]+;/g, 'box-shadow: none;');
+  }
+  // Replace border-radius with custom value for avatar images
+  themeContent = themeContent.replace(/border-radius\s*:\s*[^;]+;/g, 'border-radius: var(--avatar-border-radius);');
+  // Replace animation name with theme-specific animations
+  const enabledAnimations = Object.keys(speakingAnimations).filter(key => speakingAnimations[key]);
+  if (enabledAnimations.length > 0) {
+    const animationValue = enabledAnimations.map(anim => `${anim}-anim 0.6s infinite`).join(', ');
+    themeContent = themeContent.replace(/animation:\s*bounce-anim[^;]*/g, `animation: ${animationValue}`);
+  } else {
+    themeContent = themeContent.replace(/animation:\s*bounce-anim[^;]*/g, 'animation: none');
+  }
+
   let css = `
 /* --- Discord Streamkit Overlay Generated CSS --- */
 /* Theme: ${theme.name} */
@@ -29,7 +47,7 @@ body {
   --avatar-size: ${avatarSize}px !important;
   --base-font-size: ${baseFontSize}px !important;
   --container-padding: ${padding}px !important;
-  --container-border-radius: ${borderRadius}px !important;
+  --avatar-border-radius: ${borderRadius}px !important;
   --container-background-color: ${backgroundColor} !important;
   --name-background-color: ${nameBackgroundColor} !important;
 }
@@ -46,6 +64,8 @@ ul[class*="Voice_voiceStates"] {
   margin-left: 10px !important;
   margin-top: 10px !important;
   padding: var(--container-padding) !important; /* Padding for animation overflow in OBS */
+  border-radius: var(--container-border-radius) !important;
+  background-color: var(--container-background-color) !important;
 }
 
 span[class*="Voice_name"] {
@@ -63,7 +83,7 @@ img[class*="Voice_avatar"] {
   height: var(--avatar-size) !important;
   margin: 0 !important; /* Reset legacy margins to favor Flex Gap */
 }
-` + theme.content;
+` + themeContent;
 
   // Split theme content for per-user styles (after global styles)
   const globalAndTheme = css;
@@ -133,7 +153,7 @@ img[class*="Voice_avatar"] {
   }
 
   // Add Keyframe Animations
-  css += getAnimationCSS(animType);
+  css += getAnimationCSS(speakingAnimations);
 
   return css.trim();
 }
@@ -152,29 +172,30 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export function getAnimationCSS(type) {
-  switch (type) {
-    case 'bounce':
-      return `
+export function getAnimationCSS(animations) {
+  let css = '';
+  if (animations.bounce) {
+    css += `
 @keyframes bounce-anim {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }`;
-    case 'glow':
-      return `
+  }
+  if (animations.glow) {
+    css += `
 @keyframes glow-anim {
   0%, 100% { filter: brightness(100%); }
   50% { filter: brightness(130%); }
 }`;
-    case 'shake':
-      return `
+  }
+  if (animations.shake) {
+    css += `
 @keyframes shake-anim {
   0% { transform: rotate(0); }
   25% { transform: rotate(1deg); }
   75% { transform: rotate(-1deg); }
   100% { transform: rotate(0); }
 }`;
-    default:
-      return '';
   }
+  return css;
 }
