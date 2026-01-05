@@ -1,6 +1,6 @@
 
 import './style.css';
-import { THEMES } from './themes.js';
+import { PRESETS } from './themes.js';
 import { translations } from './i18n.js';
 import { generateCSS, getAnimationCSS } from './generator.js';
 import { createSimulator, updateSimulator, setSpeaking, toggleMetadata } from './preview.js';
@@ -10,7 +10,6 @@ let state = {
     { id: '12345678901', displayName: '', avatarUrl: '', color: '#ff4b4b', priority: 0 },
     { id: '12345678902', displayName: '', avatarUrl: '', color: '#4b4bff', priority: 1 }
   ],
-  animType: 'bounce',
   baseFontSize: 14,
   avatarSize: 100,
   gap: 0,
@@ -51,8 +50,8 @@ function init() {
 function initializeUI() {
   updateLanguageUI();
   updateButtonTitles();
-  renderThemeSelector();
-  renderThemeAnimationSettings();
+  renderPresetSelector();
+  renderPresetAnimationSettings();
   renderUserInputs();
   createSimulator(simulatorEl);
   updateUIFromState();
@@ -183,7 +182,6 @@ function setupToggleGroup(groupId, stateKey) {
 }
 
 function setupToggleGroupListeners() {
-  setupToggleGroup('anim-type-group', 'animType');
   setupToggleGroup('layout-direction-group', 'direction');
   setupToggleGroup('layout-wrap-group', 'wrap');
   setupToggleGroup('layout-align-group', 'justifyContent');
@@ -264,7 +262,7 @@ function setupLanguageSwitcher() {
 
       updateLanguageUI();
       updateButtonTitles();
-      renderThemeSelector();
+      renderPresetSelector();
       renderUserInputs();
       applyStyles();
     });
@@ -358,7 +356,7 @@ function setupActionButtons() {
         updateLanguageUI();
         updateUIFromState();
         applyStyles();
-        renderThemeSelector();
+        renderPresetSelector();
         renderUserInputs();
         showNotification(translations[state.language].loadConfig + ' OK');
       } catch (err) {
@@ -383,62 +381,74 @@ function showNotification(msg) {
   }, 2000);
 }
 
-function renderThemeAnimationSettings() {
+function renderPresetAnimationSettings() {
   const container = document.getElementById('theme-animation-settings');
   if (!container) return;
 
-  const theme = THEMES.find(t => t.id === state.themeId);
-  if (!theme) return;
+  const preset = PRESETS.find(t => t.id === state.themeId);
+  if (!preset) return;
 
-  const currentAnimations = state.themeAnimations[state.themeId] || theme.speakingAnimations || { bounce: true, glow: false, shake: false };
+  const currentAnimations = state.themeAnimations[state.themeId] || preset.speakingAnimations || { bounce: true, glow: false, shake: false };
 
   container.innerHTML = `
-    <div class="inner-group-title">テーマ固有のアニメーション設定</div>
-    <div class="animation-settings">
-      <label class="checkbox-label">
-        <input type="checkbox" data-animation="bounce" ${currentAnimations.bounce ? 'checked' : ''} />
-        Bounce (跳ねる)
-      </label>
-      <label class="checkbox-label">
-        <input type="checkbox" data-animation="glow" ${currentAnimations.glow ? 'checked' : ''} />
-        Glow (輝く)
-      </label>
-      <label class="checkbox-label">
-        <input type="checkbox" data-animation="shake" ${currentAnimations.shake ? 'checked' : ''} />
-        Shake (揺れる)
-      </label>
+    <div class="input-field horizontal">
+      <label>Bounce</label>
+      <div class="toggle-group" id="bounce-toggle-group">
+        <button type="button" class="toggle-btn ${currentAnimations.bounce ? 'active' : ''}" data-value="true">ON</button>
+        <button type="button" class="toggle-btn ${!currentAnimations.bounce ? 'active' : ''}" data-value="false">OFF</button>
+      </div>
+    </div>
+    <div class="input-field horizontal">
+      <label>Glow</label>
+      <div class="toggle-group" id="glow-toggle-group">
+        <button type="button" class="toggle-btn ${currentAnimations.glow ? 'active' : ''}" data-value="true">ON</button>
+        <button type="button" class="toggle-btn ${!currentAnimations.glow ? 'active' : ''}" data-value="false">OFF</button>
+      </div>
+    </div>
+    <div class="input-field horizontal">
+      <label>Shake</label>
+      <div class="toggle-group" id="shake-toggle-group">
+        <button type="button" class="toggle-btn ${currentAnimations.shake ? 'active' : ''}" data-value="true">ON</button>
+        <button type="button" class="toggle-btn ${!currentAnimations.shake ? 'active' : ''}" data-value="false">OFF</button>
+      </div>
     </div>
   `;
 
   // Add event listeners
-  container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', (e) => {
-      const animationType = e.target.dataset.animation;
-      if (!state.themeAnimations[state.themeId]) {
-        state.themeAnimations[state.themeId] = { ...currentAnimations };
-      }
-      state.themeAnimations[state.themeId][animationType] = e.target.checked;
-      renderThemeSelector(); // Update previews
-      applyStyles();
+  ['bounce', 'glow', 'shake'].forEach(animationType => {
+    const group = document.getElementById(`${animationType}-toggle-group`);
+    if (!group) return;
+    group.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        const value = e.target.dataset.value === 'true';
+        if (!state.themeAnimations[state.themeId]) {
+          state.themeAnimations[state.themeId] = { ...currentAnimations };
+        }
+        state.themeAnimations[state.themeId][animationType] = value;
+        renderPresetSelector(); // Update previews
+        applyStyles();
+      });
     });
   });
 }
 
-function renderThemeSelector() {
+function renderPresetSelector() {
   themeSelectorEl.innerHTML = ''; // Clear
-  
-  THEMES.forEach(theme => {
+
+  PRESETS.forEach(preset => {
     const btn = document.createElement('button');
-    btn.className = `theme-card ${state.themeId === theme.id ? 'active' : ''}`;
-    btn.dataset.theme = theme.id;
-    
+    btn.className = `theme-card ${state.themeId === preset.id ? 'active' : ''}`;
+    btn.dataset.theme = preset.id;
+
     // Create preview container
     const previewContainer = document.createElement('div');
     previewContainer.className = 'theme-preview-container';
-    
+
     // Use Shadow DOM for isolation
     const shadow = previewContainer.attachShadow({ mode: 'open' });
-    
+
     // Basic simulator HTML
     // Basic simulator HTML with Discord class structure (based on real Discord HTML)
     const miniUsers = [
@@ -455,19 +465,19 @@ function renderThemeSelector() {
     `).join('');
 
 
-    const [structuralStyles, perUserStyles] = theme.content.includes('/* --- User Highlight --- */')
-      ? theme.content.split('/* --- User Highlight --- */')
-      : [theme.content, ''];
+    const [structuralStyles, perUserStyles] = preset.content.includes('/* --- User Highlight --- */')
+      ? preset.content.split('/* --- User Highlight --- */')
+      : [preset.content, ''];
 
-    const speakingAnimations = state.themeAnimations[theme.id] || theme.speakingAnimations || { bounce: true };
+    const speakingAnimations = state.themeAnimations[preset.id] || preset.speakingAnimations || { bounce: true };
     const enabledAnimations = Object.keys(speakingAnimations).filter(key => speakingAnimations[key]);
 
-    let themeStructuralStyles = structuralStyles;
+    let presetStructuralStyles = structuralStyles;
     if (enabledAnimations.length > 0) {
       const animationValue = enabledAnimations.map(anim => `${anim}-anim 0.6s infinite`).join(', ');
-      themeStructuralStyles = structuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, `animation: ${animationValue}`);
+      presetStructuralStyles = presetStructuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, `animation: ${animationValue}`);
     } else {
-      themeStructuralStyles = structuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, 'animation: none');
+      presetStructuralStyles = presetStructuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, 'animation: none');
     }
 
     shadow.innerHTML = `
@@ -484,13 +494,13 @@ function renderThemeSelector() {
 
         /* Scale container for mini-preview */
         ul[class*="Voice_voiceStates"] {
-          transform: scale(${theme.previewScale || 0.4}) translateY(${theme.previewTranslateY || 0}px);
+          transform: scale(${preset.previewScale || 0.4}) translateY(${preset.previewTranslateY || 0}px);
         }
 
-        /* Theme Structural Styles */
-        ${themeStructuralStyles}
+        /* Preset Structural Styles */
+        ${presetStructuralStyles}
 
-        /* Theme User Styles (Mocked for mini1) */
+        /* Preset User Styles (Mocked for mini1) */
         ${perUserStyles.replace(/USER_ID/g, 'mini1').replace(/var\(--user-color\)/g, '#ff4b4b').replace(/var\(--user-color-alpha\)/g, 'rgba(255, 75, 75, 0.4)')}
 
         /* Animation CSS */
@@ -502,20 +512,24 @@ function renderThemeSelector() {
     `;
 
     btn.appendChild(previewContainer);
-    
+
     const label = document.createElement('span');
     label.className = 'theme-name';
-    label.textContent = theme.name;
+    label.textContent = preset.name;
     btn.appendChild(label);
-    
+
     btn.addEventListener('click', () => {
-      state.themeId = theme.id;
+      state.themeId = preset.id;
+      // Apply preset parameters, excluding unsetUserCount
+      const { unsetUserCount, ...presetParams } = preset.preset;
+      Object.assign(state, presetParams);
+      updateUIFromState();
       document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
-      renderThemeAnimationSettings();
+      renderPresetAnimationSettings();
       applyStyles();
     });
-    
+
     themeSelectorEl.appendChild(btn);
   });
 }
@@ -656,7 +670,6 @@ function updateUIFromState() {
     });
   }
 
-  syncToggleGroup('anim-type-group', state.animType);
   syncToggleGroup('layout-direction-group', state.direction);
   syncToggleGroup('layout-wrap-group', state.wrap);
   syncToggleGroup('layout-align-group', state.justifyContent);

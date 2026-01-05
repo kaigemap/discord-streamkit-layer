@@ -8,7 +8,7 @@ import vertical from './themes/vertical.css?raw';
  * Theme Registry
  */
 
-export const THEMES = [
+export const PRESETS = [
   {
     id: 'circle',
     name: 'Circle',
@@ -22,6 +22,23 @@ export const THEMES = [
       bounce: true,
       glow: false,
       shake: false
+    },
+    preset: {
+      direction: 'row',
+      wrap: 'wrap',
+      justifyContent: 'flex-start',
+      gap: 10,
+      avatarSize: 100,
+      baseFontSize: 14,
+      padding: 20,
+      borderRadius: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      nameBackgroundColor: 'rgba(30, 33, 36, 0.95)',
+      shadowEnabled: true,
+      hideNames: false,
+      onlyRegistered: false,
+      unsetUserCount: 3,
+      defaultColor: '#ffffff'
     }
   },
   {
@@ -35,6 +52,23 @@ export const THEMES = [
       bounce: false,
       glow: true,
       shake: false
+    },
+    preset: {
+      direction: 'column',
+      wrap: 'nowrap',
+      justifyContent: 'flex-start',
+      gap: 5,
+      avatarSize: 80,
+      baseFontSize: 12,
+      padding: 10,
+      borderRadius: 10,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      nameBackgroundColor: 'rgba(30, 33, 36, 0.95)',
+      shadowEnabled: true,
+      hideNames: false,
+      onlyRegistered: false,
+      unsetUserCount: 3,
+      defaultColor: '#ffffff'
     }
   },
   {
@@ -48,6 +82,23 @@ export const THEMES = [
       bounce: false,
       glow: false,
       shake: true
+    },
+    preset: {
+      direction: 'row',
+      wrap: 'nowrap',
+      justifyContent: 'center',
+      gap: 20,
+      avatarSize: 120,
+      baseFontSize: 16,
+      padding: 30,
+      borderRadius: 20,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      nameBackgroundColor: 'rgba(30, 33, 36, 0.95)',
+      shadowEnabled: true,
+      hideNames: false,
+      onlyRegistered: false,
+      unsetUserCount: 3,
+      defaultColor: '#ffffff'
     }
   },
   {
@@ -61,6 +112,23 @@ export const THEMES = [
       bounce: true,
       glow: false,
       shake: false
+    },
+    preset: {
+      direction: 'row',
+      wrap: 'nowrap',
+      justifyContent: 'flex-start',
+      gap: 5,
+      avatarSize: 64,
+      baseFontSize: 14,
+      padding: 10,
+      borderRadius: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      nameBackgroundColor: 'rgba(30, 33, 36, 0.95)',
+      shadowEnabled: true,
+      hideNames: false,
+      onlyRegistered: false,
+      unsetUserCount: 3,
+      defaultColor: '#ffffff'
     }
   },
   {
@@ -74,6 +142,26 @@ export const THEMES = [
       bounce: true,
       glow: false,
       shake: false
+    },
+    preset: {
+      direction: 'column',
+      wrap: 'nowrap',
+      justifyContent: 'flex-start',
+      gap: 10,
+      avatarSize: 80,
+      baseFontSize: 14,
+      padding: 20,
+      borderRadius: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      nameBackgroundColor: 'rgba(30, 33, 36, 0.95)',
+      shadowEnabled: true,
+      hideNames: false,
+      onlyRegistered: false,
+      unsetUserCount: 3,
+      defaultColor: '#ffffff'
     }
   }
 ];
+
+// Backward compatibility
+export const THEMES = PRESETS;

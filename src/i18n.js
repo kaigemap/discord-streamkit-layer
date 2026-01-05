@@ -1,9 +1,9 @@
 export const translations = {
   en: {
-    themes: 'Themes',
+    themes: 'Presets',
     general: 'General',
     layout: 'Layout',
-    themeCustom: 'Theme Customization',
+    themeCustom: 'Preset Customization',
     globalSettings: 'Size Settings',
     baseFontSize: 'Base Font Size (px)',
     users: 'Member Customization',
@@ -58,10 +58,10 @@ export const translations = {
     commonSettings: 'Common Settings'
   },
   ja: {
-    themes: 'テーマ',
-    general: 'テーマカスタム',
+    themes: 'プリセット',
+    general: 'プリセットカスタム',
     layout: 'レイアウト',
-    themeCustom: 'テーマカスタム',
+    themeCustom: 'プリセットカスタム',
     globalSettings: 'サイズ設定',
     baseFontSize: 'フォントサイズ',
     borderRadius: '角丸',

@@ -2,7 +2,7 @@ import { THEMES } from './themes.js';
 
 export function generateCSS(config) {
   const {
-    users, animType, baseFontSize, avatarSize = 100,
+    users, baseFontSize, avatarSize = 100,
     gap = 0, direction = 'row', wrap = 'nowrap', justifyContent = 'flex-start',
     themeId = 'horizontal', defaultColor = '#ffffff', displayedUsers = [],
     padding = 20, borderRadius = 0, backgroundColor = 'rgba(0, 0, 0, 0)', nameBackgroundColor = 'rgba(30, 33, 36, 0.95)',
@@ -10,6 +10,7 @@ export function generateCSS(config) {
   } = config;
   const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
   const speakingAnimations = themeAnimations[themeId] || theme.speakingAnimations || { bounce: true };
+  const finalSpeakingAnimations = speakingAnimations;
 
   const defaultColorRgba = hexToRgba(defaultColor, 0.4);
 
@@ -22,7 +23,7 @@ export function generateCSS(config) {
   // Replace border-radius with custom value for avatar images
   themeContent = themeContent.replace(/border-radius\s*:\s*[^;]+;/g, 'border-radius: var(--avatar-border-radius);');
   // Replace animation name with theme-specific animations
-  const enabledAnimations = Object.keys(speakingAnimations).filter(key => speakingAnimations[key]);
+  const enabledAnimations = Object.keys(finalSpeakingAnimations).filter(key => finalSpeakingAnimations[key]);
   if (enabledAnimations.length > 0) {
     const animationValue = enabledAnimations.map(anim => `${anim}-anim 0.6s infinite`).join(', ');
     themeContent = themeContent.replace(/animation:\s*bounce-anim[^;]*/g, `animation: ${animationValue}`);
@@ -153,7 +154,7 @@ img[class*="Voice_avatar"] {
   }
 
   // Add Keyframe Animations
-  css += getAnimationCSS(speakingAnimations);
+  css += getAnimationCSS(finalSpeakingAnimations);
 
   return css.trim();
 }
