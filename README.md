@@ -1,4 +1,4 @@
-# Discord StreamKit Overlay Generator
+# DiscordPyoko
 
 A web-based tool for generating custom CSS overlays for Discord StreamKit voice states.
 
