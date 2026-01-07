@@ -103,7 +103,7 @@ export const translations = {
     livePreview: 'ライブプレビュー',
     showAllUsers: '全員',
     showOnlyRegistered: '登録のみ',
-    visibility: '表示設定',
+    visibility: '表示',
     hidden: '非表示リスト入り',
     copiedAction: 'CSSをコピーしました！',
     horizontal: 'サークル',

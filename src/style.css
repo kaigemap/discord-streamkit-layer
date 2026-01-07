@@ -11,7 +11,7 @@
   --font-main: 'Noto Sans JP', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
-  --sidebar-width: 380px;
+  --sidebar-width: 480px;
 }
 
 * {
@@ -176,13 +176,14 @@ body {
 
 .sidebar-tabs {
   display: flex;
-  padding: 8px 16px;
+  padding: 0px 16px;
   background-color: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid var(--border-color);
-  gap: 8px;
+  gap: 0;
 }
 
 .sidebar-tab {
+  display: grid;
   flex: 1;
   background: none;
   border: none;
@@ -797,8 +798,8 @@ body.overlay-active .floating-panel {
 /* User Table Grid Layout */
 .user-table-grid {
   display: grid;
-  grid-template-columns: 30px 1fr 1fr 120px 45px 30px 56px;
-  gap: 8px;
+  grid-template-columns: 30px 1fr 1fr 120px 48px 20px 20px;
+  gap: 4px;
   align-items: center;
 }
 
@@ -819,8 +820,7 @@ body.overlay-active .floating-panel {
   background-color: var(--bg-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 6px 8px;
-  margin-bottom: 4px;
+  padding: 2px;
   
   /* Inherit grid from shared class applied in HTML */
 }
@@ -1031,7 +1031,7 @@ body.overlay-active .floating-panel {
 /* Avatar Override Styles */
 .avatar-input-container {
   display: flex;
-  gap: 4px;
+  gap: 1px;
   align-items: center;
   min-width: 0;
 }
