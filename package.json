@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build",
+    "deploy": "npm run build && gh-pages -d docs",
     "bundle-offline": "npm run build && zip -r overlay-generator-offline.zip dist"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "vite": "^5.0.0"
   }
 }
