@@ -3,20 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Streamkit Overlay Generator</title>
+    <title>DiscordPyoko</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/discord-streamkit-layer/overlay/default.css">
-    <script type="module" crossorigin src="/discord-streamkit-layer/assets/index-nOFENhyI.js"></script>
-    <link rel="stylesheet" crossorigin href="/discord-streamkit-layer/assets/index-DMc4wGAV.css">
+    <script type="module" crossorigin src="/discord-streamkit-layer/assets/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/discord-streamkit-layer/assets/index.css">
   </head>
   <body class="dark-theme">
     <div id="app">
       <aside class="sidebar">
         <header class="sidebar-header">
           <div class="header-main">
-            <h1>Overlay Gen</h1>
+            <h1>DiscordPyoko</h1>
             <span class="version">v1.0.0</span>
           </div>
           <div class="lang-switcher">
@@ -51,17 +50,45 @@
               </div>
 
               <div class="input-field horizontal">
+                <label for="container-padding" data-i18n="containerPadding">Container Padding</label>
+                <div class="dual-input">
+                  <input type="range" id="container-padding-slider" min="0" max="100" value="20" />
+                  <input type="number" id="container-padding" value="20" min="0" max="100" />
+                </div>
+              </div>
+              <div class="input-field horizontal">
+                <label for="border-radius" data-i18n="borderRadius">Border Radius</label>
+                <div class="dual-input">
+                  <input type="range" id="border-radius-slider" min="0" max="50" value="0" />
+                  <input type="number" id="border-radius" value="0" min="0" max="50" />
+                </div>
+              </div>
+
+              <div class="input-field horizontal">
+                <label for="background-color" data-i18n="backgroundColor">Background Color</label>
+                <input type="color" id="background-color" value="#000000" />
+              </div>
+              <div class="input-field horizontal">
+                <label for="name-background-color" data-i18n="nameBackgroundColor">Name Background</label>
+                <input type="color" id="name-background-color" value="#1e2024" />
+              </div>
+
+              <div class="input-field horizontal">
                 <label for="hide-names" data-i18n="hideNames">Hide Names</label>
                 <input type="checkbox" id="hide-names" />
               </div>
 
+
+
               <div class="input-field horizontal">
-                <label for="anim-type" data-i18n="speakingAnimation">Anim</label>
-                <div class="toggle-group" id="anim-type-group">
-                  <button type="button" class="toggle-btn active" data-value="bounce">Bounce</button>
-                  <button type="button" class="toggle-btn" data-value="glow">Glow</button>
-                  <button type="button" class="toggle-btn" data-value="shake">Shake</button>
+                <label for="shadow-enabled" data-i18n="shadowEnabled">Shadow</label>
+                <div class="toggle-group" id="shadow-enabled-group">
+                  <button type="button" class="toggle-btn active" data-value="true">ON</button>
+                  <button type="button" class="toggle-btn" data-value="false">OFF</button>
                 </div>
+              </div>
+              <div id="theme-animation-settings" class="theme-animation-settings">
+                <!-- Theme-specific animation settings will be injected here -->
               </div>
             </div>
           </div>
@@ -118,12 +145,15 @@
 
               <div class="inner-group-title" data-i18n="userListHeader">Individual Settings</div>
               <div class="user-table-header user-table-grid">
+                <span class="header-label" data-i18n="visibility">表示</span>
                 <span class="header-label" data-i18n="userId">ID</span>
-                <span class="header-label" data-i18n="displayName">Display Name</span>
+                <span class="header-label" data-i18n="displayName">Name</span>
+                <span class="header-label" data-i18n="avatarOverride">Avatar</span>
                 <span class="header-label" data-i18n="priority">Sort</span>
                 <span class="header-label" data-i18n="userColor">Color</span>
                 <span class="header-label"></span>
               </div>
+              <input type="file" id="avatar-upload-base" accept="image/*" style="display: none;" />
               <div id="user-list">
                 <!-- User inputs will be injected here -->
               </div>
