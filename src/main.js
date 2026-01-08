@@ -29,6 +29,7 @@ let state = {
   nameBackgroundColor: 'rgba(30, 33, 36, 0.95)', // Name background
   shadowEnabled: true, // Enable/disable shadow effect
   themeAnimations: {}, // Theme-specific speaking animations
+  filePrefix: new Date().toISOString().slice(0, 10).replace(/-/g, ''), // File prefix
   isOverlayMode: new URLSearchParams(window.location.search).get('mode') === 'overlay'
 };
 
@@ -51,6 +52,7 @@ function initializeUI() {
   updateLanguageUI();
   updateButtonTitles();
   renderPresetSelector();
+  applyDefaultPreset();
   renderPresetAnimationSettings();
   renderUserInputs();
   createSimulator(simulatorEl);
@@ -58,6 +60,17 @@ function initializeUI() {
   // Update unset button text
   const btn = document.getElementById('toggle-unset-users');
   btn.textContent = `Unset Users (${state.unsetUserCount})`;
+}
+
+function applyDefaultPreset() {
+  const preset = PRESETS.find(p => p.id === state.themeId);
+  if (preset) {
+    const { unsetUserCount, ...presetParams } = preset.preset;
+    Object.assign(state, presetParams);
+    updateUIFromState();
+    renderPresetAnimationSettings();
+    applyStyles();
+  }
 }
 
 function setupEventListeners() {
@@ -223,6 +236,11 @@ function setupInputSyncListeners() {
   };
   updateUnsetButton();
 
+  // File prefix input
+  document.getElementById('file-prefix').addEventListener('input', (e) => {
+    state.filePrefix = e.target.value;
+  });
+
   // Override update to also update button
   const originalUpdate = syncDualInput;
   // Wait, better to add after syncDualInput
@@ -272,10 +290,11 @@ function setupLanguageSwitcher() {
 function setupSidebarTabs() {
   document.querySelectorAll('.sidebar-tab').forEach(tab => {
     tab.addEventListener('click', (e) => {
-      const target = e.target.dataset.sidebarTab;
+      const targetTab = e.target.closest('.sidebar-tab');
+      const target = targetTab.dataset.sidebarTab;
 
       document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
+      targetTab.classList.add('active');
 
       document.querySelectorAll('.sidebar-scroll').forEach(panel => {
         panel.classList.remove('active');
@@ -290,6 +309,14 @@ function setupSidebarTabs() {
       }
     });
   });
+}
+
+function getCssFilename() {
+  return state.filePrefix + '_discordpyoko.css';
+}
+
+function getJsonFilename() {
+  return state.filePrefix + '_discordpyoko-setting.json';
 }
 
 function setupActionButtons() {
@@ -317,7 +344,7 @@ function setupActionButtons() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = "overlay.css";
+    a.download = getCssFilename();
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -327,7 +354,7 @@ function setupActionButtons() {
     const url = URL.createObjectURL(blob);
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", url);
-    downloadAnchorNode.setAttribute("download", "overlay-config.json");
+    downloadAnchorNode.setAttribute("download", getJsonFilename());
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
@@ -698,6 +725,9 @@ function updateUIFromState() {
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === state.language);
   });
+
+  // Sync File Prefix
+  document.getElementById('file-prefix').value = state.filePrefix;
 
   // Sync Sidebar Tabs (default to settings if active tab doesn't match new state context somehow)
   // (Usually sidebar tab state isn't in JSON but we want to reset to something sensible or keep current)

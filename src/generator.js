@@ -100,7 +100,7 @@ img[class*="Voice_avatar"] {
   }
 
   // Use displayedUsers instead of just registered users to include unset users
-  const sortedDisplayedUsers = [...displayedUsers].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
+  const sortedDisplayedUsers = [...displayedUsers].filter(user => !user.id.startsWith('unset_')).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
   sortedDisplayedUsers.forEach((user, index) => {
     if (!user.id) return;
@@ -127,6 +127,9 @@ img[class*="Voice_avatar"] {
 
     // Always override with displayName
     userCSS += `\n/* Override custom name */\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: var(--base-font-size) !important;\n}\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
+
+    // Apply order based on sorted index
+    userCSS += `\n/* Order override */\nli[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  order: ${index} !important;\n}\n`;
 
     // Avatar Override
     if (user.avatarUrl) {
