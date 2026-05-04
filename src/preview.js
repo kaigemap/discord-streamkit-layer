@@ -15,7 +15,6 @@ export function createSimulator(container) {
 export function updateSimulator(users) {
   const list = document.getElementById('simulator-list');
   if (!list) return;
-  console.log('updateSimulator: users length:', users.length);
 
   list.innerHTML = users.map((user, index) => {
     const defaultName = user.name || `User ${index + 1}`;
@@ -24,19 +23,18 @@ export function updateSimulator(users) {
       ? (user.avatarUrl.includes('#id=') ? user.avatarUrl : `${user.avatarUrl}#id=${user.id}`)
       : `https://cdn.discordapp.com/embed/avatars/${index % 6}.png#id=${user.id}`;
     return `
-      <li class="Voice_voiceState voice_state" data-userid="${user.id}">
-        <img class="Voice_avatar voice_avatar" src="${avatarSrc}" style="object-fit: cover;" />
+      <li class="Voice_voiceState voice_state" data-userid="${escapeHtmlAttr(user.id)}">
+        <img class="Voice_avatar voice_avatar" src="${escapeHtmlAttr(avatarSrc)}" style="object-fit: cover;" />
         <div class="Voice_user voice_username">
-          <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">${displayName}</span>
+          <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">${escapeHtmlText(displayName)}</span>
         </div>
       </li>
     `;
   }).join('');
-  console.log('li count:', document.querySelectorAll('#simulator-list li').length);
 }
 
 export function setSpeaking(userId, isSpeaking) {
-  const node = document.querySelector(`#simulator-list [data-userid="${userId}"]`);
+  const node = document.querySelector(`#simulator-list [data-userid="${escapeCssString(userId)}"]`);
   if (node) {
     const avatar = node.querySelector('.Voice_avatar');
     if (avatar) {
@@ -49,6 +47,22 @@ export function setSpeaking(userId, isSpeaking) {
       }
     }
   }
+}
+
+function escapeHtmlAttr(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeHtmlText(value) {
+  return escapeHtmlAttr(value).replace(/'/g, '&#39;');
+}
+
+function escapeCssString(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 export function toggleMetadata() {

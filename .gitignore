@@ -4,7 +4,7 @@ package-lock.json
 
 # Build output
 dist/
-# docs/  # Uncomment to ignore docs folder
+# docs/ is the committed GitHub Pages output from `npm run build`.
 
 # macOS
 .DS_Store
@@ -12,9 +12,6 @@ dist/
 # Development files
 test-output.css
 BACKLOG.md
-
-# Custom files (if not needed for public)
-# custom/  # Uncomment if custom files should be ignored
 
 # Temporary files
 *.log

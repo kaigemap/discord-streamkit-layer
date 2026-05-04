@@ -21,6 +21,7 @@ export const translations = {
     copyCss: 'Copy CSS',
     saveCss: 'Download .css',
     saveConfig: 'Save .json',
+    saveBundle: 'Save CSS + Settings',
     loadConfig: 'Load .json',
     labelSave: 'Save',
     labelLoad: 'Load',
@@ -30,6 +31,8 @@ export const translations = {
     layoutSettings: 'Layout Settings',
     spacing: 'Spacing (Gap px)',
     direction: 'Direction',
+    directionRow: 'Horizontal',
+    directionColumn: 'Vertical',
     wrap: 'Wrapping',
     alignment: 'Alignment (Start)',
     vertical: 'Vertical',
@@ -55,7 +58,12 @@ export const translations = {
     defaultColor: 'Default Color',
     userListHeader: 'Individual Settings',
     colVisibility: 'Show?',
-    commonSettings: 'Common Settings'
+    commonSettings: 'Common Settings',
+    preset_circle: 'Avatar Only',
+    preset_portrait: 'Portrait Icon',
+    preset_actor: 'Square Avatar',
+    preset_horizontal: 'Name Badge',
+    preset_vertical: 'Voice List'
   },
   ja: {
     themes: 'プリセット',
@@ -81,6 +89,7 @@ export const translations = {
     copyCss: 'CSSをコピー',
     saveCss: 'ファイル保存',
     saveConfig: 'ファイル保存',
+    saveBundle: 'CSSと設定を保存',
     loadConfig: 'ファイル読込',
     labelSave: '保存',
     labelLoad: '読込',
@@ -90,6 +99,8 @@ export const translations = {
     layoutSettings: 'レイアウト設定',
     spacing: '間隔 (Gap px)',
     direction: '並ぶ向き',
+    directionRow: '横',
+    directionColumn: '縦',
     wrap: '折り返し',
     alignment: '始点 (揃え)',
     vertical: '縦',
@@ -116,6 +127,11 @@ export const translations = {
     userListHeader: '個別設定リスト',
     colVisibility: '表示',
     commonSettings: '共通設定',
-    participantCount: '未設定のメンバーのプレビュー人数'
+    participantCount: '未設定のメンバーのプレビュー人数',
+    preset_circle: '丸アイコン',
+    preset_portrait: '立ち絵アイコン',
+    preset_actor: '四角アイコン',
+    preset_horizontal: '名前バッジ',
+    preset_vertical: '通話リスト'
   }
 };

@@ -19,7 +19,7 @@ li[class*="Voice_voiceState"] {
 img[class*="Voice_avatar"] {
   width: var(--avatar-size) !important;
   height: var(--avatar-size) !important;
-  border-radius: 50% !important;
+  border-radius: var(--avatar-border-radius) !important;
   border: none !important; /* Remove default Discord border to prevent position shift */
   box-shadow: 0 0 0 4px rgb(160, 160, 160);
   transition: 0.1s;
@@ -58,11 +58,14 @@ span[class*="Voice_name"] {
 }
 
 /* --- User Highlight --- */
+li[class*="Voice_voiceState"][data-userid="USER_ID"] img[class*="Voice_avatar"],
 img[src*="USER_ID"][class*="Voice_avatar"] {
   box-shadow: 0 0 0 4px var(--user-color);
 }
 
 /* --- User Speaking --- */
+li[class*="Voice_voiceState"][data-userid="USER_ID"].wrapper_speaking img[class*="Voice_avatar"],
+li[class*="Voice_voiceState"][data-userid="USER_ID"] img[class*="Voice_avatar"][class*="Voice_avatarSpeaking"],
 img[src*="USER_ID"][class*="Voice_avatar"][class*="Voice_avatarSpeaking"],
 img[src*="USER_ID"][class*="Voice_avatar"].speaking {
   filter: brightness(100%);

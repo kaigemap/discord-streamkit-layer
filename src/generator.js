@@ -11,6 +11,7 @@ export function generateCSS(config) {
   const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
   const speakingAnimations = themeAnimations[themeId] || theme.speakingAnimations || { bounce: true };
   const finalSpeakingAnimations = speakingAnimations;
+  const avatarBorderRadius = borderRadius >= 50 ? '999px' : `${borderRadius}px`;
 
   const defaultColorRgba = hexToRgba(defaultColor, 0.4);
 
@@ -20,8 +21,6 @@ export function generateCSS(config) {
     // Replace box-shadow with none when shadow is disabled
     themeContent = themeContent.replace(/box-shadow\s*:\s*[^;]+;/g, 'box-shadow: none;');
   }
-  // Replace border-radius with custom value for avatar images
-  themeContent = themeContent.replace(/border-radius\s*:\s*[^;]+;/g, 'border-radius: var(--avatar-border-radius);');
   // Replace animation name with theme-specific animations
   const enabledAnimations = Object.keys(finalSpeakingAnimations).filter(key => finalSpeakingAnimations[key]);
   if (enabledAnimations.length > 0) {
@@ -30,6 +29,7 @@ export function generateCSS(config) {
   } else {
     themeContent = themeContent.replace(/animation:\s*bounce-anim[^;]*/g, 'animation: none');
   }
+  const visibleVoiceStateDisplay = getVoiceStateDisplay(themeContent);
 
   let css = `
 /* --- Discord Streamkit Overlay Generated CSS --- */
@@ -48,7 +48,8 @@ body {
   --avatar-size: ${avatarSize}px !important;
   --base-font-size: ${baseFontSize}px !important;
   --container-padding: ${padding}px !important;
-  --avatar-border-radius: ${borderRadius}px !important;
+  --avatar-border-radius: ${avatarBorderRadius} !important;
+  --container-border-radius: ${borderRadius}px !important;
   --container-background-color: ${backgroundColor} !important;
   --name-background-color: ${nameBackgroundColor} !important;
 }
@@ -100,54 +101,61 @@ img[class*="Voice_avatar"] {
   }
 
   // Use displayedUsers instead of just registered users to include unset users
-  const sortedDisplayedUsers = [...displayedUsers].filter(user => !user.id.startsWith('unset_')).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
+  const sourceUsers = displayedUsers.length > 0 ? displayedUsers : users;
+  const sortedDisplayedUsers = [...sourceUsers].filter(user => !String(user.id).startsWith('unset_')).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
   sortedDisplayedUsers.forEach((user, index) => {
     if (!user.id) return;
 
-    // Ensure user.id is a string and safe
-    const safeUserId = String(user.id).replace(/[^a-zA-Z0-9_]/g, '');
+    const userId = String(user.id);
+    const userIdAttr = escapeCssString(userId);
+    const userSelector = `li[class*="Voice_voiceState"][data-userid="${userIdAttr}"]`;
+    const userSelectorFallback = `li[class*="Voice_voiceState"]:has(img[src*="${userIdAttr}"])`;
 
     const defaultName = user.name || `User ${index + 1}`;
     const displayName = user.displayName && user.displayName.trim() !== '' ? user.displayName : defaultName;
+    const displayNameCss = escapeCssString(displayName);
+    const displayNameComment = escapeCssComment(displayName);
 
     // Check per-user visibility (Hide-list)
     if (user.isHidden) {
-      css += `\n/* User ${displayName} is in Hide-list */\nli[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  display: none !important;\n}\n`;
+      css += `\n/* User ${displayNameComment} is in Hide-list */\n${buildUserRule(userSelector, userSelectorFallback, 'display: none !important;')}\n`;
       return; // Skip other styles for hidden users
     }
 
     const colorRGBA = hexToRgba(user.color, 0.4);
+    const scopedUserVars = `--user-color: ${user.color} !important;\n  --user-color-alpha: ${colorRGBA} !important;`;
 
     let userCSS = perUserStyles
-      .replace(/USER_ID/g, safeUserId)
+      .replace(/USER_ID/g, userIdAttr)
       .replace(/var\(--user-color\)/g, user.color)
       .replace(/var\(--user-color-alpha\)/g, colorRGBA)
       .replace(/{{avatarSize}}/g, avatarSize);
 
     // Always override with displayName
-    userCSS += `\n/* Override custom name */\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayName}" !important;\n  display: block !important;\n  font-size: var(--base-font-size) !important;\n}\nimg[src*="${safeUserId}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
+    userCSS += `\n/* Override custom name */\nimg[src*="${userIdAttr}"] + div[class*="Voice_user"] span[class*="Voice_name"]::after {\n  content: "${displayNameCss}" !important;\n  display: block !important;\n  font-size: var(--base-font-size) !important;\n}\nimg[src*="${userIdAttr}"] + div[class*="Voice_user"] span[class*="Voice_name"] {\n  font-size: 0 !important;\n  height: auto !important;\n}\n`;
 
     // Apply order based on sorted index
-    userCSS += `\n/* Order override */\nli[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  order: ${index} !important;\n}\n`;
+    userCSS += `\n/* Order override */\n${buildUserRule(userSelector, userSelectorFallback, `order: ${index} !important;`)}\n`;
 
     // Avatar Override
     if (user.avatarUrl) {
       // Append #id=... to the URL so that img[src*="ID"] selector still matches
-      const urlWithId = user.avatarUrl.includes('#id=') ? user.avatarUrl : `${user.avatarUrl}#id=${safeUserId}`;
-      userCSS += `\n/* Override Avatar */\nimg[src*="${safeUserId}"] {\n  content: url("${urlWithId}") !important;\n  object-fit: cover !important;\n}\n`;
+      const urlWithId = user.avatarUrl.includes('#id=') ? user.avatarUrl : `${user.avatarUrl}#id=${encodeURIComponent(userId)}`;
+      userCSS += `\n/* Override Avatar */\nimg[src*="${userIdAttr}"] {\n  content: url("${escapeCssString(urlWithId)}") !important;\n  object-fit: cover !important;\n}\n`;
     }
 
-    css += `\n/* User: ${displayName} */\n`;
+    css += `\n/* User: ${displayNameComment} */\n`;
+    css += buildUserRule(userSelector, userSelectorFallback, scopedUserVars) + '\n';
     // If Solo Mode is ON, we must force-show the registered players
     if (config.onlyRegistered) {
-      css += `li[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  display: flex !important;\n}\n`;
+      css += buildUserRule(userSelector, userSelectorFallback, `display: ${visibleVoiceStateDisplay} !important;`) + '\n';
     }
     css += `${userCSS}\n`;
 
     // If Solo Mode is ON, explicitly hide unset users
-    if (config.onlyRegistered && user.id.startsWith('unset_')) {
-      css += `li[class*="Voice_voiceState"]:has(img[src*="${safeUserId}"]) {\n  display: none !important;\n}\n`;
+    if (config.onlyRegistered && userId.startsWith('unset_')) {
+      css += buildUserRule(userSelector, userSelectorFallback, 'display: none !important;') + '\n';
     }
   });
 
@@ -160,6 +168,27 @@ img[class*="Voice_avatar"] {
   css += getAnimationCSS(finalSpeakingAnimations);
 
   return css.trim();
+}
+
+function getVoiceStateDisplay(themeContent) {
+  const voiceStateRule = themeContent.match(/li\[class[\*\^]?="Voice_voiceState"\]\s*\{[^}]*display\s*:\s*([^;!]+)(?:\s*!important)?\s*;/);
+  return voiceStateRule ? voiceStateRule[1].trim() : 'flex';
+}
+
+function buildUserRule(selector, fallbackSelector, declaration) {
+  return `${selector} {\n  ${declaration}\n}\n@supports selector(:has(*)) {\n  ${fallbackSelector} {\n    ${declaration}\n  }\n}`;
+}
+
+function escapeCssString(value) {
+  return String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\A ')
+    .replace(/\r/g, '');
+}
+
+function escapeCssComment(value) {
+  return String(value).replace(/\*\//g, '* /').replace(/\r?\n/g, ' ');
 }
 
 function hexToRgba(hex, alpha) {

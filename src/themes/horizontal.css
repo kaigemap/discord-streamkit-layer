@@ -21,7 +21,7 @@ li[class^="Voice_voiceState"] {
 img[class*="Voice_avatar"] {
   width: var(--avatar-size) !important;
   height: var(--avatar-size) !important;
-  border-radius: 50% !important;
+  border-radius: var(--avatar-border-radius) !important;
   border: none !important; /* Remove default Discord border to prevent position shift */
   margin-right: 12px !important; /* Space between avatar and name */
   box-shadow: 0 0 0 0px transparent;
@@ -39,7 +39,7 @@ span[class^="Voice_name"] {
   display: block !important;
   background-color: rgba(0, 0, 0, 0.5);
   padding: 4px 8px !important;
-  border-radius: 4px !important;
+  border-radius: var(--container-border-radius) !important;
   color: white !important;
   font-size: 16px !important; /* Will be overridden by generator */
   text-align: left !important;
@@ -47,6 +47,7 @@ span[class^="Voice_name"] {
 
 /* --- User Highlight --- */
 /* User Color applies to Name Background in this theme */
+li[class^="Voice_voiceState"][data-userid="USER_ID"] img[class*="Voice_avatar"] + div[class^="Voice_user"] span[class^="Voice_name"],
 img[src*="USER_ID"] + div[class^="Voice_user"] span[class^="Voice_name"] {
   background-color: var(--user-color) !important;
   color: white !important; /* Ensure text is visible on color */
@@ -54,6 +55,8 @@ img[src*="USER_ID"] + div[class^="Voice_user"] span[class^="Voice_name"] {
 }
 
 /* --- User Speaking --- */
+li[class^="Voice_voiceState"][data-userid="USER_ID"].wrapper_speaking img[class*="Voice_avatar"],
+li[class^="Voice_voiceState"][data-userid="USER_ID"] img[class*="Voice_avatarSpeaking"],
 img[src*="USER_ID"][class*="Voice_avatarSpeaking"] {
   border-color: var(--user-color) !important;
   box-shadow: 0 0 0 3px var(--user-color);

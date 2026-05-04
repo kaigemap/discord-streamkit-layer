@@ -1,66 +1,73 @@
-/* Theme: Portrait */
+/* Theme: Portrait Icon */
 
 /* --- Container --- */
 ul[class^="Voice_voiceStates"] {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 20px;
+  display: flex;
 }
 
 /* --- User Base --- */
 li[class^="Voice_voiceState"] {
   position: relative;
+  display: block !important;
   width: var(--avatar-size);
-  height: calc(var(--avatar-size) * 1.33);
-  overflow: hidden;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
+  height: calc(var(--avatar-size) * 1.35);
+  padding: 0;
+  overflow: visible;
 }
 
 /* Avatar Base Style */
 img[class*="Voice_avatar"] {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center bottom;
+  border: none !important;
   border-radius: 0;
-  border: none !important; /* Remove default Discord border to prevent position shift */
-  transition: transform 0.3s ease;
-  filter: brightness(60%);
+  filter: brightness(62%);
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+
+/* Name Container */
+div[class^="Voice_user"] {
+  position: absolute !important;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
 }
 
 /* Name Style */
 span[class^="Voice_name"] {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.8) !important;
-  padding: 4px !important;
-  word-break: keep-all;
-  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 100));
-  
-  /* Clipping Protection */
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 3px 7px !important;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.68) !important;
+  color: white !important;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
 }
 
-
 /* --- User Highlight --- */
-li[class^="Voice_voiceState"]:has(img[src*="USER_ID"]) {
-  border: 2px solid var(--user-color);
+li[class^="Voice_voiceState"][data-userid="USER_ID"] img[class*="Voice_avatar"] {
+  filter: brightness(62%) drop-shadow(0 0 8px var(--user-color-alpha));
+}
+
+li[class^="Voice_voiceState"]:has(img[src*="USER_ID"]) img[class*="Voice_avatar"] {
+  filter: brightness(62%) drop-shadow(0 0 8px var(--user-color-alpha));
 }
 
 /* --- User Speaking --- */
+li[class^="Voice_voiceState"][data-userid="USER_ID"].wrapper_speaking img[class*="Voice_avatar"],
 img[src*="USER_ID"][class*="Voice_avatarSpeaking"] {
-  transform: scale(1.05);
-  filter: brightness(100%);
+  filter: brightness(100%) drop-shadow(0 0 14px var(--user-color));
   animation: bounce-anim 0.6s infinite !important;
 }
 
-li[class^="Voice_voiceState"]:has(img[src*="USER_ID"][class*="Voice_avatarSpeaking"]) {
-  box-shadow: 0 0 15px var(--user-color);
+li[class^="Voice_voiceState"]:has(img[src*="USER_ID"][class*="Voice_avatarSpeaking"]) img[class*="Voice_avatar"] {
+  filter: brightness(100%) drop-shadow(0 0 14px var(--user-color));
 }

@@ -16,7 +16,7 @@
         <header class="sidebar-header">
           <div class="header-main">
             <h1>DiscordPyoko</h1>
-            <span class="version">v1.0.0</span>
+            <span class="version">v0.0.1</span>
           </div>
           <div class="lang-switcher">
             <button class="lang-btn" data-lang="en">EN</button>
@@ -24,111 +24,52 @@
           </div>
         </header>
 
-        <div class="sidebar-tabs">
-          <button class="sidebar-tab active" data-sidebar-tab="users" data-i18n="users"><span class="material-symbols-rounded">group</span>メンバーカスタム</button>
-          <button class="sidebar-tab" data-sidebar-tab="general" data-i18n="general"><span class="material-symbols-rounded">palette</span>テーマカスタム</button>
-          <button class="sidebar-tab" data-sidebar-tab="layout" data-i18n="layout"><span class="material-symbols-rounded">view_module</span>レイアウト</button>
-          <button class="sidebar-tab" data-sidebar-tab="css" data-i18n="cssPreview"><span class="material-symbols-rounded">code</span>CSSプレビュー</button>
-        </div>
+        <div class="sidebar-body">
+          <nav class="mode-rail" aria-label="Editor panes">
+            <button type="button" class="mode-rail-btn active" data-pane-target="presets" title="Presets">
+              <span class="material-symbols-rounded">palette</span>
+            </button>
+            <button type="button" class="mode-rail-btn" data-pane-target="members" title="Members">
+              <span class="material-symbols-rounded">group</span>
+            </button>
+            <button type="button" class="mode-rail-btn" data-pane-target="output" title="Output">
+              <span class="material-symbols-rounded">ios_share</span>
+            </button>
+          </nav>
 
-        <div class="sidebar-content-wrapper">
-          <div class="sidebar-scroll" id="sidebar-tab-general">
-            <div class="group-content">
-              <div class="input-field horizontal">
-                <label for="avatar-size" data-i18n="avatarSize">Avatar Size</label>
+          <div class="sidebar-content-wrapper">
+            <section class="pane-panel active" data-pane="presets">
+              <div class="pane-section-heading">
+                <div class="inner-group-title" data-i18n="themes">Presets</div>
+              </div>
+              <div class="theme-scroll-container">
+                <div class="theme-grid" id="theme-selector">
+                  <!-- Rendered via main.js -->
+                </div>
+              </div>
+
+              <div class="pane-section-heading secondary-heading">
+                <div class="inner-group-title" data-i18n="livePreview">Preview</div>
+              </div>
+              <div class="preview-control-grid">
+                <button id="toggle-debug" class="btn btn-secondary" data-i18n="toggleMetadata">Show IDs</button>
+                <button id="toggle-unset-users" class="btn btn-secondary">Unset Users</button>
+              </div>
+              <div id="unset-users-control" class="inline-panel hidden">
+                <label for="unset-count" class="mini-label">Unset User Count</label>
                 <div class="dual-input">
-                  <input type="range" id="avatar-size-slider" min="32" max="300" value="100" />
-                  <input type="number" id="avatar-size" value="100" min="32" max="300" />
+                  <input type="range" id="unset-count-slider" min="0" max="20" value="3" />
+                  <input type="number" id="unset-count" value="3" min="0" max="20" />
                 </div>
               </div>
-              <div class="input-field horizontal">
-                <label for="base-font-size" data-i18n="baseFontSize">Font Size</label>
-                <div class="dual-input">
-                  <input type="range" id="base-font-size-slider" min="8" max="48" value="14" />
-                  <input type="number" id="base-font-size" value="14" min="8" max="48" />
-                </div>
+            </section>
+
+            <section class="pane-panel" data-pane="members">
+              <div class="pane-section-heading">
+                <div class="inner-group-title" data-i18n="users">Member Customization</div>
+                <button id="add-user" class="btn btn-secondary btn-sm" data-i18n="addUser">+ Add Member Setting</button>
               </div>
 
-              <div class="input-field horizontal">
-                <label for="container-padding" data-i18n="containerPadding">Container Padding</label>
-                <div class="dual-input">
-                  <input type="range" id="container-padding-slider" min="0" max="100" value="20" />
-                  <input type="number" id="container-padding" value="20" min="0" max="100" />
-                </div>
-              </div>
-              <div class="input-field horizontal">
-                <label for="border-radius" data-i18n="borderRadius">Border Radius</label>
-                <div class="dual-input">
-                  <input type="range" id="border-radius-slider" min="0" max="50" value="0" />
-                  <input type="number" id="border-radius" value="0" min="0" max="50" />
-                </div>
-              </div>
-
-              <div class="input-field horizontal">
-                <label for="background-color" data-i18n="backgroundColor">Background Color</label>
-                <input type="color" id="background-color" value="#000000" />
-              </div>
-              <div class="input-field horizontal">
-                <label for="name-background-color" data-i18n="nameBackgroundColor">Name Background</label>
-                <input type="color" id="name-background-color" value="#1e2024" />
-              </div>
-
-              <div class="input-field horizontal">
-                <label for="hide-names" data-i18n="hideNames">Hide Names</label>
-                <input type="checkbox" id="hide-names" />
-              </div>
-
-
-
-              <div class="input-field horizontal">
-                <label for="shadow-enabled" data-i18n="shadowEnabled">Shadow</label>
-                <div class="toggle-group" id="shadow-enabled-group">
-                  <button type="button" class="toggle-btn active" data-value="true">ON</button>
-                  <button type="button" class="toggle-btn" data-value="false">OFF</button>
-                </div>
-              </div>
-              <div id="theme-animation-settings" class="theme-animation-settings">
-                <!-- Theme-specific animation settings will be injected here -->
-              </div>
-            </div>
-          </div>
-
-          <div class="sidebar-scroll" id="sidebar-tab-layout">
-            <div class="group-content">
-              <div class="input-field horizontal">
-                <label for="layout-gap" data-i18n="spacing">Spacing</label>
-                <div class="dual-input">
-                  <input type="range" id="layout-gap-slider" min="-50" max="200" value="0" />
-                  <input type="number" id="layout-gap" value="0" min="-50" max="200" />
-                </div>
-              </div>
-              <div class="input-field horizontal">
-                <label for="layout-direction" data-i18n="direction">Dir</label>
-                <div class="toggle-group" id="layout-direction-group">
-                  <button type="button" class="toggle-btn active" data-value="row" data-i18n="vertical">Horiz</button>
-                  <button type="button" class="toggle-btn" data-value="column" data-i18n="horizontal">Vert</button>
-                </div>
-              </div>
-              <div class="input-field horizontal">
-                <label for="layout-wrap" data-i18n="wrap">Wrap</label>
-                <div class="toggle-group" id="layout-wrap-group">
-                  <button type="button" class="toggle-btn active" data-value="nowrap" data-i18n="wrapOff">No Wrap</button>
-                  <button type="button" class="toggle-btn" data-value="wrap" data-i18n="wrapOn">Wrap</button>
-                </div>
-              </div>
-              <div class="input-field horizontal">
-                <label for="layout-align" data-i18n="alignment">Align</label>
-                <div class="toggle-group" id="layout-align-group">
-                  <button type="button" class="toggle-btn active" data-value="flex-start" data-i18n="alignStart">Start</button>
-                  <button type="button" class="toggle-btn" data-value="center" data-i18n="alignCenter">Center</button>
-                  <button type="button" class="toggle-btn" data-value="flex-end" data-i18n="alignEnd">End</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sidebar-scroll active" id="sidebar-tab-users">
-            <div class="group-content">
               <div class="settings-toolbar">
                 <div class="toolbar-item grow">
                   <label class="mini-label" data-i18n="unlistedMembers">Unlisted</label>
@@ -143,89 +84,141 @@
                 </div>
               </div>
 
-              <div class="inner-group-title" data-i18n="userListHeader">Individual Settings</div>
-              <div class="user-table-header user-table-grid">
-                <span class="header-label" data-i18n="visibility">表示</span>
-                <span class="header-label" data-i18n="userId">ID</span>
-                <span class="header-label" data-i18n="displayName">Name</span>
-                <span class="header-label" data-i18n="avatarOverride">Avatar</span>
-                <span class="header-label" data-i18n="priority">Sort</span>
-                <span class="header-label" data-i18n="userColor">Color</span>
-                <span class="header-label"></span>
-              </div>
               <input type="file" id="avatar-upload-base" accept="image/*" style="display: none;" />
-              <div id="user-list">
+              <div id="user-list" class="user-card-list">
                 <!-- User inputs will be injected here -->
               </div>
-              <button id="add-user" class="btn btn-secondary btn-sm" data-i18n="addUser">+ Add Member Setting</button>
-            </div>
-          </div>
+            </section>
 
-          <div class="sidebar-scroll" id="sidebar-tab-css">
-            <div class="group-content">
+            <section class="pane-panel" data-pane="output">
+              <div class="pane-section-heading">
+                <div class="inner-group-title" data-i18n="groupCss">CSS Output</div>
+                <button id="copy-css" class="btn-icon" title="Copy CSS">
+                  <span class="material-symbols-rounded">content_copy</span>
+                </button>
+              </div>
               <pre id="css-output" class="sidebar-css-preview"></pre>
-            </div>
+            </section>
           </div>
-        </div> <!-- Close sidebar-content-wrapper -->
+        </div>
 
         <footer class="sidebar-footer">
+          <div class="input-field horizontal">
+            <label for="file-prefix">File Prefix</label>
+            <input type="text" id="file-prefix" value="20260109" />
+          </div>
           <div class="footer-group">
-            <div class="footer-group-label" data-i18n="groupCss">CSS</div>
+            <div class="footer-group-label" data-i18n="labelSave">Save</div>
             <div class="footer-row-icons">
-              <button id="copy-css" class="btn-icon" title="Copy CSS">
-                <span class="material-symbols-rounded">content_copy</span>
-              </button>
-              <button id="download-css" class="btn-icon" title="Download .css">
+              <button id="save-bundle" class="btn-icon" title="Save CSS + Settings">
                 <span class="material-symbols-rounded">download</span>
               </button>
             </div>
           </div>
 
           <div class="footer-group">
-            <div class="footer-group-label" data-i18n="groupConfig">Settings</div>
+            <div class="footer-group-label" data-i18n="labelLoad">Load</div>
             <div class="footer-row-icons">
-              <button id="export-json" class="btn-icon" title="Save .json">
-                <span class="material-symbols-rounded">save</span>
-              </button>
               <button id="import-json-btn" class="btn-icon" title="Load .json">
                 <span class="material-symbols-rounded">upload</span>
               </button>
             </div>
-            <input type="file" id="import-json-input" accept=".json" style="display: none;" />
+            <input type="file" id="import-json-input" accept=".json,.zip,application/json,application/zip" style="display: none;" />
           </div>
         </footer>
       </aside>
 
       <main class="preview-area">
-        <div class="preview-header">
-          <section class="theme-selector-strip">
-            <label class="strip-label" data-i18n="themes">Themes</label>
-            <div class="theme-scroll-container">
-              <div class="theme-grid" id="theme-selector">
-                <!-- Rendered via main.js -->
+        <header class="property-bar">
+          <div class="property-group">
+            <div class="input-field compact">
+              <label for="avatar-size" data-i18n="avatarSize">Avatar Size</label>
+              <div class="dual-input">
+                <input type="range" id="avatar-size-slider" min="32" max="300" value="100" />
+                <input type="number" id="avatar-size" value="100" min="32" max="300" />
               </div>
             </div>
-          </section>
-        </div>
-        <div class="preview-container" id="tab-live">
-          <div class="floating-btn-group">
-            <button id="toggle-debug" class="floating-btn" data-i18n="toggleMetadata">
-              Show IDs
-            </button>
-            <button id="toggle-unset-users" class="floating-btn">
-              Unset Users
-            </button>
+            <div class="input-field compact">
+              <label for="base-font-size" data-i18n="baseFontSize">Font Size</label>
+              <div class="dual-input">
+                <input type="range" id="base-font-size-slider" min="8" max="48" value="14" />
+                <input type="number" id="base-font-size" value="14" min="8" max="48" />
+              </div>
+            </div>
+            <div class="input-field compact">
+              <label for="border-radius" data-i18n="borderRadius">Border Radius</label>
+              <div class="dual-input">
+                <input type="range" id="border-radius-slider" min="0" max="50" value="0" />
+                <input type="number" id="border-radius" value="0" min="0" max="50" />
+              </div>
+            </div>
+            <div class="input-field compact">
+              <label for="container-padding" data-i18n="containerPadding">Container Padding</label>
+              <div class="dual-input">
+                <input type="range" id="container-padding-slider" min="0" max="100" value="20" />
+                <input type="number" id="container-padding" value="20" min="0" max="100" />
+              </div>
+            </div>
           </div>
+
+          <div class="property-group compact-options">
+            <div class="input-field mini-control">
+              <label for="layout-gap" data-i18n="spacing">Spacing</label>
+              <div class="dual-input">
+                <input type="range" id="layout-gap-slider" min="-50" max="200" value="0" />
+                <input type="number" id="layout-gap" value="0" min="-50" max="200" />
+              </div>
+            </div>
+            <div class="input-field mini-control">
+              <label for="layout-direction" data-i18n="direction">Dir</label>
+              <div class="toggle-group" id="layout-direction-group">
+                <button type="button" class="toggle-btn active" data-value="row" data-i18n="directionRow">Horiz</button>
+                <button type="button" class="toggle-btn" data-value="column" data-i18n="directionColumn">Vert</button>
+              </div>
+            </div>
+            <div class="input-field mini-control">
+              <label for="layout-wrap" data-i18n="wrap">Wrap</label>
+              <div class="toggle-group" id="layout-wrap-group">
+                <button type="button" class="toggle-btn active" data-value="nowrap" data-i18n="wrapOff">No Wrap</button>
+                <button type="button" class="toggle-btn" data-value="wrap" data-i18n="wrapOn">Wrap</button>
+              </div>
+            </div>
+            <div class="input-field mini-control">
+              <label for="layout-align" data-i18n="alignment">Align</label>
+              <div class="toggle-group" id="layout-align-group">
+                <button type="button" class="toggle-btn active" data-value="flex-start" data-i18n="alignStart">Start</button>
+                <button type="button" class="toggle-btn" data-value="center" data-i18n="alignCenter">Center</button>
+                <button type="button" class="toggle-btn" data-value="flex-end" data-i18n="alignEnd">End</button>
+              </div>
+            </div>
+            <div class="input-field mini-control color-control">
+              <label for="background-color" data-i18n="backgroundColor">Background Color</label>
+              <input type="color" id="background-color" value="#000000" />
+            </div>
+            <div class="input-field mini-control color-control">
+              <label for="name-background-color" data-i18n="nameBackgroundColor">Name Background</label>
+              <input type="color" id="name-background-color" value="#1e2024" />
+            </div>
+            <label class="check-control">
+              <span data-i18n="hideNames">Hide Names</span>
+              <input type="checkbox" id="hide-names" />
+            </label>
+            <div class="input-field mini-control">
+              <label for="shadow-enabled" data-i18n="shadowEnabled">Shadow</label>
+              <div class="toggle-group" id="shadow-enabled-group">
+                <button type="button" class="toggle-btn active" data-value="true">ON</button>
+                <button type="button" class="toggle-btn" data-value="false">OFF</button>
+              </div>
+            </div>
+            <div id="theme-animation-settings" class="theme-animation-settings">
+              <!-- Theme-specific animation settings will be injected here -->
+            </div>
+          </div>
+        </header>
+        <div class="preview-container" id="tab-live">
           <div class="preview-inner">
             <div id="discord-simulator" class="discord-simulator">
               <!-- Discord UI simulation will be injected here -->
-            </div>
-          </div>
-          <div id="unset-users-control" class="floating-panel hidden">
-            <label for="unset-count" style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; display: block;">Unset User Count</label>
-            <div class="dual-input">
-              <input type="range" id="unset-count-slider" min="0" max="20" value="3" />
-              <input type="number" id="unset-count" value="3" min="0" max="20" />
             </div>
           </div>
         </div>

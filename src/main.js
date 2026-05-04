@@ -2,7 +2,7 @@
 import './style.css';
 import { PRESETS } from './themes.js';
 import { translations } from './i18n.js';
-import { generateCSS, getAnimationCSS } from './generator.js';
+import { generateCSS } from './generator.js';
 import { createSimulator, updateSimulator, setSpeaking, toggleMetadata } from './preview.js';
 
 let state = {
@@ -40,6 +40,7 @@ if (state.isOverlayMode) {
 const userListEl = document.getElementById('user-list');
 const themeSelectorEl = document.getElementById('theme-selector');
 const simulatorEl = document.getElementById('discord-simulator');
+let currentSpeakingUserId = null;
 
 function init() {
   initializeUI();
@@ -78,12 +79,17 @@ function setupEventListeners() {
   setupToggleGroupListeners();
   setupInputSyncListeners();
   setupLanguageSwitcher();
-  setupSidebarTabs();
+  setupPaneNavigation();
   setupActionButtons();
 }
 
 function startSpeakingSimulation() {
   function runSpeakingLoop() {
+    if (currentSpeakingUserId) {
+      setSpeaking(currentSpeakingUserId, false);
+      currentSpeakingUserId = null;
+    }
+
     // Get users that are actually present in the main preview and not hidden
     const speakingUsers = Array.from(document.querySelectorAll('#simulator-list [data-userid]')).map(el => {
       const userId = el.dataset.userid;
@@ -93,14 +99,14 @@ function startSpeakingSimulation() {
 
     if (speakingUsers.length > 0) {
       const randomUser = speakingUsers[Math.floor(Math.random() * speakingUsers.length)];
+      currentSpeakingUserId = randomUser.id;
       setSpeaking(randomUser.id, true);
-      updateMiniPreviewsSpeaking(randomUser.id, true);
 
-      const duration = 1200 + Math.random() * 1800;
+      const duration = 1800 + Math.random() * 1200;
 
       setTimeout(() => {
-        setSpeaking(randomUser.id, false);
-        updateMiniPreviewsSpeaking(randomUser.id, false);
+        setSpeaking(currentSpeakingUserId, false);
+        currentSpeakingUserId = null;
         const pause = 400 + Math.random() * 1000;
         setTimeout(runSpeakingLoop, pause);
       }, duration);
@@ -109,25 +115,6 @@ function startSpeakingSimulation() {
     }
   }
   runSpeakingLoop();
-}
-
-function updateMiniPreviewsSpeaking(userId, isSpeaking) {
-  document.querySelectorAll('.theme-card').forEach(card => {
-    const shadow = card.querySelector('.theme-preview-container')?.shadowRoot;
-    if (shadow) {
-      const miniUserEl = shadow.querySelector('[data-userid="mini1"]');
-      const avatar = miniUserEl?.querySelector('.Voice_avatar');
-      if (miniUserEl && avatar) {
-        if (isSpeaking) {
-          miniUserEl.classList.add('wrapper_speaking');
-          avatar.classList.add('Voice_avatarSpeaking');
-        } else {
-          miniUserEl.classList.remove('wrapper_speaking');
-          avatar.classList.remove('Voice_avatarSpeaking');
-        }
-      }
-    }
-  });
 }
 
 function setupUserManagementListeners() {
@@ -145,25 +132,24 @@ function setupUserManagementListeners() {
 
   // Handle Avatar Image Upload
   const avatarUploadBase = document.getElementById('avatar-upload-base');
-  let activeUploadingUserId = null;
+  let activeUploadingUserIndex = null;
 
   userListEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-upload');
     if (btn) {
-      activeUploadingUserId = btn.dataset.userid;
+      activeUploadingUserIndex = Number(btn.dataset.index);
       avatarUploadBase.click();
     }
   });
 
   avatarUploadBase.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    if (file && activeUploadingUserId) {
+    if (file && Number.isInteger(activeUploadingUserIndex)) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const base64Data = event.target.result;
-        const userIndex = state.users.findIndex(u => u.id === activeUploadingUserId);
-        if (userIndex !== -1) {
-          state.users[userIndex].avatarUrl = base64Data;
+        if (state.users[activeUploadingUserIndex]) {
+          state.users[activeUploadingUserIndex].avatarUrl = base64Data;
           renderUserInputs();
           applyStyles();
         }
@@ -188,7 +174,6 @@ function setupToggleGroup(groupId, stateKey) {
       } else {
         state[stateKey] = stateKey === 'onlyRegistered' ? value === 'hide' : value;
       }
-      console.log('toggle clicked', groupId, value, 'stateKey', stateKey, 'new state value', state[stateKey]);
       applyStyles();
     });
   });
@@ -263,6 +248,11 @@ function setupInputSyncListeners() {
     state.hideNames = e.target.checked;
     applyStyles();
   });
+
+  document.getElementById('default-color').addEventListener('input', (e) => {
+    state.defaultColor = e.target.value;
+    applyStyles();
+  });
 }
 
 function getRandomColor() {
@@ -287,26 +277,16 @@ function setupLanguageSwitcher() {
   });
 }
 
-function setupSidebarTabs() {
-  document.querySelectorAll('.sidebar-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      const targetTab = e.target.closest('.sidebar-tab');
-      const target = targetTab.dataset.sidebarTab;
-
-      document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
-      targetTab.classList.add('active');
-
-      document.querySelectorAll('.sidebar-scroll').forEach(panel => {
-        panel.classList.remove('active');
-        panel.style.display = 'none';
+function setupPaneNavigation() {
+  document.querySelectorAll('.mode-rail-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.paneTarget;
+      document.querySelectorAll('.mode-rail-btn').forEach(item => {
+        item.classList.toggle('active', item === btn);
       });
-      const activePanel = document.getElementById(`sidebar-tab-${target}`);
-      activePanel.classList.add('active');
-      activePanel.style.display = 'flex';
-
-      if (target === 'css') {
-        document.getElementById('css-output').textContent = generateCSS(state);
-      }
+      document.querySelectorAll('.pane-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.pane === target);
+      });
     });
   });
 }
@@ -317,6 +297,160 @@ function getCssFilename() {
 
 function getJsonFilename() {
   return state.filePrefix + '_discordpyoko-setting.json';
+}
+
+function getBundleFilename() {
+  return state.filePrefix + '_discordpyoko.zip';
+}
+
+function getExportState() {
+  const { displayedUsers, isOverlayMode, ...exportState } = state;
+  return exportState;
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const crcTable = (() => {
+  const table = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let crc = i;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 1) ? (0xedb88320 ^ (crc >>> 1)) : (crc >>> 1);
+    }
+    table[i] = crc >>> 0;
+  }
+  return table;
+})();
+
+function getCrc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc = crcTable[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function writeUint16(view, offset, value) {
+  view.setUint16(offset, value, true);
+}
+
+function writeUint32(view, offset, value) {
+  view.setUint32(offset, value, true);
+}
+
+function createZipBlob(files) {
+  const encoder = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  files.forEach(file => {
+    const nameBytes = encoder.encode(file.name);
+    const contentBytes = encoder.encode(file.content);
+    const crc = getCrc32(contentBytes);
+
+    const localHeader = new ArrayBuffer(30);
+    const localView = new DataView(localHeader);
+    writeUint32(localView, 0, 0x04034b50);
+    writeUint16(localView, 4, 20);
+    writeUint16(localView, 6, 0);
+    writeUint16(localView, 8, 0);
+    writeUint16(localView, 10, 0);
+    writeUint16(localView, 12, 0);
+    writeUint32(localView, 14, crc);
+    writeUint32(localView, 18, contentBytes.length);
+    writeUint32(localView, 22, contentBytes.length);
+    writeUint16(localView, 26, nameBytes.length);
+    writeUint16(localView, 28, 0);
+
+    localParts.push(localHeader, nameBytes, contentBytes);
+
+    const centralHeader = new ArrayBuffer(46);
+    const centralView = new DataView(centralHeader);
+    writeUint32(centralView, 0, 0x02014b50);
+    writeUint16(centralView, 4, 20);
+    writeUint16(centralView, 6, 20);
+    writeUint16(centralView, 8, 0);
+    writeUint16(centralView, 10, 0);
+    writeUint16(centralView, 12, 0);
+    writeUint16(centralView, 14, 0);
+    writeUint32(centralView, 16, crc);
+    writeUint32(centralView, 20, contentBytes.length);
+    writeUint32(centralView, 24, contentBytes.length);
+    writeUint16(centralView, 28, nameBytes.length);
+    writeUint16(centralView, 30, 0);
+    writeUint16(centralView, 32, 0);
+    writeUint16(centralView, 34, 0);
+    writeUint16(centralView, 36, 0);
+    writeUint32(centralView, 38, 0);
+    writeUint32(centralView, 42, offset);
+
+    centralParts.push(centralHeader, nameBytes);
+    offset += 30 + nameBytes.length + contentBytes.length;
+  });
+
+  const centralSize = centralParts.reduce((sum, part) => sum + part.byteLength, 0);
+  const endHeader = new ArrayBuffer(22);
+  const endView = new DataView(endHeader);
+  writeUint32(endView, 0, 0x06054b50);
+  writeUint16(endView, 4, 0);
+  writeUint16(endView, 6, 0);
+  writeUint16(endView, 8, files.length);
+  writeUint16(endView, 10, files.length);
+  writeUint32(endView, 12, centralSize);
+  writeUint32(endView, 16, offset);
+  writeUint16(endView, 20, 0);
+
+  return new Blob([...localParts, ...centralParts, endHeader], { type: 'application/zip' });
+}
+
+function readZipTextFiles(buffer) {
+  const view = new DataView(buffer);
+  const decoder = new TextDecoder();
+  const files = [];
+  let offset = 0;
+
+  while (offset + 30 <= buffer.byteLength && view.getUint32(offset, true) === 0x04034b50) {
+    const compressionMethod = view.getUint16(offset + 8, true);
+    const compressedSize = view.getUint32(offset + 18, true);
+    const filenameLength = view.getUint16(offset + 26, true);
+    const extraLength = view.getUint16(offset + 28, true);
+    const nameStart = offset + 30;
+    const dataStart = nameStart + filenameLength + extraLength;
+    const dataEnd = dataStart + compressedSize;
+
+    if (dataEnd > buffer.byteLength) {
+      break;
+    }
+
+    const name = decoder.decode(new Uint8Array(buffer, nameStart, filenameLength));
+    if (compressionMethod === 0) {
+      const content = decoder.decode(new Uint8Array(buffer, dataStart, compressedSize));
+      files.push({ name, content });
+    }
+
+    offset = dataEnd;
+  }
+
+  return files;
+}
+
+function importConfigText(text) {
+  const config = JSON.parse(text);
+  state = { ...state, ...config };
+  updateLanguageUI();
+  updateUIFromState();
+  applyStyles();
+  renderPresetSelector();
+  renderUserInputs();
+  showNotification(translations[state.language].loadConfig + ' OK');
 }
 
 function setupActionButtons() {
@@ -338,27 +472,14 @@ function setupActionButtons() {
     });
   });
 
-  document.getElementById('download-css').addEventListener('click', () => {
+  document.getElementById('save-bundle').addEventListener('click', () => {
     const css = generateCSS(state);
-    const blob = new Blob([css], { type: 'text/css' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = getCssFilename();
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  document.getElementById('export-json').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", url);
-    downloadAnchorNode.setAttribute("download", getJsonFilename());
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-    URL.revokeObjectURL(url);
+    const settings = JSON.stringify(getExportState(), null, 2);
+    const blob = createZipBlob([
+      { name: getCssFilename(), content: css },
+      { name: getJsonFilename(), content: settings }
+    ]);
+    downloadBlob(blob, getBundleFilename());
   });
 
   document.getElementById('import-json-btn').addEventListener('click', () => {
@@ -368,30 +489,32 @@ function setupActionButtons() {
   document.getElementById('import-json-input').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) {
-      console.log('No file selected');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        console.log('File loaded, parsing JSON...');
-        const config = JSON.parse(event.target.result);
-        console.log('Parsed config:', config);
-        state = { ...state, ...config };
-        console.log('State updated:', state);
-        updateLanguageUI();
-        updateUIFromState();
-        applyStyles();
-        renderPresetSelector();
-        renderUserInputs();
-        showNotification(translations[state.language].loadConfig + ' OK');
+        if (file.name.toLowerCase().endsWith('.zip')) {
+          const files = readZipTextFiles(event.target.result);
+          const settingsFile = files.find(item => item.name.toLowerCase().endsWith('.json'));
+          if (!settingsFile) {
+            throw new Error('settings json not found in zip');
+          }
+          importConfigText(settingsFile.content);
+        } else {
+          importConfigText(event.target.result);
+        }
       } catch (err) {
         console.error('JSON parse error:', err);
         showNotification('Invalid JSON: ' + err.message);
       }
     };
-    reader.readAsText(file);
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
     e.target.value = '';
   });
 }
@@ -454,7 +577,6 @@ function renderPresetAnimationSettings() {
           state.themeAnimations[state.themeId] = { ...currentAnimations };
         }
         state.themeAnimations[state.themeId][animationType] = value;
-        renderPresetSelector(); // Update previews
         applyStyles();
       });
     });
@@ -468,81 +590,204 @@ function renderPresetSelector() {
     const btn = document.createElement('button');
     btn.className = `theme-card ${state.themeId === preset.id ? 'active' : ''}`;
     btn.dataset.theme = preset.id;
+    btn.type = 'button';
 
-    // Create preview container
     const previewContainer = document.createElement('div');
     previewContainer.className = 'theme-preview-container';
 
-    // Use Shadow DOM for isolation
     const shadow = previewContainer.attachShadow({ mode: 'open' });
-
-    // Basic simulator HTML
-    // Basic simulator HTML with Discord class structure (based on real Discord HTML)
-    const miniUsers = [
-      { id: 'mini1', color: '#ff4b4b' }
-    ];
-
-    const userHtml = miniUsers.map((u, i) => `
-      <li class="Voice_voiceState voice_state" data-userid="${u.id}">
-        <img class="Voice_avatar voice_avatar Voice_avatarSpeaking" src="https://cdn.discordapp.com/embed/avatars/${i % 6}.png#id=${u.id}" />
-        <div class="Voice_user voice_username">
-          <span class="Voice_name" style="color: rgb(255, 255, 255); font-size: 14px; background-color: rgba(30, 33, 36, 0.95);">User</span>
-        </div>
-      </li>
-    `).join('');
-
-
-    const [structuralStyles, perUserStyles] = preset.content.includes('/* --- User Highlight --- */')
-      ? preset.content.split('/* --- User Highlight --- */')
-      : [preset.content, ''];
-
-    const speakingAnimations = state.themeAnimations[preset.id] || preset.speakingAnimations || { bounce: true };
-    const enabledAnimations = Object.keys(speakingAnimations).filter(key => speakingAnimations[key]);
-
-    let presetStructuralStyles = structuralStyles;
-    if (enabledAnimations.length > 0) {
-      const animationValue = enabledAnimations.map(anim => `${anim}-anim 0.6s infinite`).join(', ');
-      presetStructuralStyles = presetStructuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, `animation: ${animationValue}`);
-    } else {
-      presetStructuralStyles = presetStructuralStyles.replace(/animation:\s*bounce-anim[^;]*/g, 'animation: none');
-    }
 
     shadow.innerHTML = `
       <style>
         :host {
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          display: grid;
+          place-items: center;
           width: 100%;
           height: 100%;
           overflow: hidden;
           background-color: #0b0d10;
         }
 
-        /* Scale container for mini-preview */
-        ul[class*="Voice_voiceStates"] {
-          transform: scale(${preset.previewScale || 0.4}) translateY(${preset.previewTranslateY || 0}px);
+        *,
+        *::before,
+        *::after {
+          box-sizing: border-box;
+          animation: none !important;
+          transition: none !important;
         }
 
-        /* Preset Structural Styles */
-        ${presetStructuralStyles}
+        .thumb {
+          width: 100%;
+          height: 100%;
+          padding: 10px;
+          display: grid;
+          place-items: center;
+          color: #f4f4f5;
+          font-family: system-ui, sans-serif;
+          overflow: hidden;
+        }
 
-        /* Preset User Styles (Mocked for mini1) */
-        ${perUserStyles.replace(/USER_ID/g, 'mini1').replace(/var\(--user-color\)/g, '#ff4b4b').replace(/var\(--user-color-alpha\)/g, 'rgba(255, 75, 75, 0.4)')}
+        .cluster {
+          max-width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+        }
 
-        /* Animation CSS */
-        ${getAnimationCSS(speakingAnimations)}
+        .stack {
+          display: grid;
+          gap: 6px;
+          justify-items: start;
+        }
+
+        .avatar {
+          width: 34px;
+          height: 34px;
+          flex: 0 0 auto;
+          display: grid;
+          place-items: center;
+          background: #5865f2;
+          color: white;
+          font-size: 12px;
+          font-weight: 800;
+          line-height: 1;
+          box-shadow: 0 0 0 3px #ef4444, 0 0 18px rgba(239, 68, 68, 0.58);
+        }
+
+        .avatar::before {
+          content: "";
+          width: 17px;
+          height: 12px;
+          border-radius: 999px 999px 7px 7px;
+          background: currentColor;
+          box-shadow: inset 5px 5px 0 -3px #5865f2, inset -5px 5px 0 -3px #5865f2;
+        }
+
+        .avatar.idle {
+          background: #52525b;
+          box-shadow: 0 0 0 2px rgba(255,255,255,0.18);
+          opacity: 0.72;
+        }
+
+        .avatar.idle::before {
+          box-shadow: inset 5px 5px 0 -3px #52525b, inset -5px 5px 0 -3px #52525b;
+        }
+
+        .circle .avatar,
+        .badge .avatar,
+        .list .avatar {
+          border-radius: 999px;
+        }
+
+        .square .avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 0;
+        }
+
+        .badge .name,
+        .list .name {
+          min-width: 42px;
+          padding: 4px 8px;
+          border-radius: 5px;
+          background: #dc2626;
+          color: white;
+          font-size: 10px;
+          font-weight: 750;
+          line-height: 1;
+          text-align: center;
+          box-shadow: 0 5px 18px rgba(220, 38, 38, 0.28);
+        }
+
+        .list .row {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }
+
+        .list .row + .row .name {
+          background: #27272a;
+          color: #d4d4d8;
+          box-shadow: none;
+        }
+
+        .portrait-card {
+          width: 48px;
+          height: 64px;
+          border: 2px solid #ef4444;
+          border-radius: 8px;
+          background: #18181b;
+          box-shadow: 0 0 20px rgba(239, 68, 68, 0.48);
+          display: grid;
+          grid-template-rows: minmax(0, 1fr) 16px;
+          overflow: hidden;
+        }
+
+        .portrait-card .mark {
+          display: grid;
+          place-items: center;
+          min-height: 0;
+          background: #5865f2;
+        }
+
+        .portrait-card .mark::before {
+          content: "";
+          width: 22px;
+          height: 15px;
+          border-radius: 999px 999px 8px 8px;
+          background: #f4f4f5;
+          box-shadow: inset 6px 6px 0 -4px #5865f2, inset -6px 6px 0 -4px #5865f2;
+        }
+
+        .portrait-card .caption {
+          display: grid;
+          place-items: center;
+          background: rgba(0,0,0,0.62);
+          font-size: 9px;
+          font-weight: 750;
+        }
+
+        .standee {
+          width: 46px;
+          height: 68px;
+          position: relative;
+          filter: brightness(62%);
+        }
+
+        .standee::before {
+          content: "";
+          position: absolute;
+          right: 7px;
+          bottom: 0;
+          left: 7px;
+          height: 58px;
+          border-radius: 999px 999px 8px 8px;
+          background: linear-gradient(#5865f2 0 44%, #3f4ed8 44% 100%);
+          box-shadow: 0 0 0 2px #ef4444, 0 0 18px rgba(239, 68, 68, 0.58);
+        }
+
+        .standee::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          bottom: 31px;
+          width: 19px;
+          height: 13px;
+          transform: translateX(-50%);
+          border-radius: 999px 999px 7px 7px;
+          background: #f4f4f5;
+          box-shadow: inset 5px 5px 0 -3px #5865f2, inset -5px 5px 0 -3px #5865f2;
+        }
       </style>
-      <ul class="Voice_voiceStates voice-states">
-        ${userHtml}
-      </ul>
+      ${getPresetPreviewMarkup(preset.id)}
     `;
 
     btn.appendChild(previewContainer);
 
     const label = document.createElement('span');
     label.className = 'theme-name';
-    label.textContent = preset.name;
+    label.textContent = getPresetLabel(preset);
     btn.appendChild(label);
 
     btn.addEventListener('click', () => {
@@ -561,32 +806,121 @@ function renderPresetSelector() {
   });
 }
 
+function getPresetPreviewMarkup(presetId) {
+  if (presetId === 'circle') {
+    return `
+      <div class="thumb circle">
+        <div class="cluster">
+          <div class="avatar"></div>
+          <div class="avatar idle"></div>
+          <div class="avatar idle"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (presetId === 'actor') {
+    return `
+      <div class="thumb portrait">
+        <div class="portrait-card">
+          <div class="mark"></div>
+          <div class="caption">NAME</div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (presetId === 'horizontal') {
+    return `
+      <div class="thumb badge">
+        <div class="cluster">
+          <div class="avatar"></div>
+          <div class="name">NAME</div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (presetId === 'vertical') {
+    return `
+      <div class="thumb list">
+        <div class="stack">
+          <div class="row">
+            <div class="avatar"></div>
+            <div class="name">NAME</div>
+          </div>
+          <div class="row">
+            <div class="avatar idle"></div>
+            <div class="name">NAME</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="thumb portrait">
+      <div class="standee"></div>
+    </div>
+  `;
+}
+
+function getPresetLabel(preset) {
+  const key = `preset_${preset.id}`;
+  return translations[state.language][key] || preset.name;
+}
+
 function renderUserInputs() {
   userListEl.innerHTML = '';
   const sortedUsers = [...state.users].map((user, originalIndex) => ({ ...user, originalIndex })).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
   sortedUsers.forEach((user, sortedIndex) => {
+    const userId = String(user.id);
+    const escapedId = escapeHtmlAttr(userId);
+    const escapedDisplayName = escapeHtmlAttr(user.displayName || '');
+    const escapedAvatarUrl = escapeHtmlAttr(user.avatarUrl || '');
+    const avatarPreviewId = `preview-user-${user.originalIndex}`;
     const div = document.createElement('div');
-    div.className = `user-item user-table-grid`;
+    div.className = `user-item ${user.isHidden ? 'user-item-hidden' : ''}`;
     div.innerHTML = `
-      <button class="visibility-toggle ${user.isHidden ? 'hidden' : ''}" data-userid="${user.id}" title="${translations[state.language].visibility}">
-        <span class="material-symbols-rounded">${user.isHidden ? 'visibility_off' : 'visibility'}</span>
-      </button>
-      <input type="text" value="${user.id}" data-type="id" data-userid="${user.id}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
-      <input type="text" value="${user.displayName || ''}" data-type="displayName" data-userid="${user.id}" placeholder="上書きする場合のみ入力" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
-      
-      <div class="avatar-input-container">
-        <img src="${user.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="avatar-preview" id="preview-${user.id}" />
-        <input type="text" value="${user.avatarUrl || ''}" data-type="avatarUrl" data-userid="${user.id}" class="avatar-url-input" placeholder="URL / DataURI" title="${translations[state.language].avatarOverride}" ${user.isHidden ? 'disabled' : ''} />
-        <button class="btn-upload" data-userid="${user.id}" title="Upload Image" ${user.isHidden ? 'disabled' : ''}>
-          <span class="material-symbols-rounded" style="font-size: 16px;">upload_file</span>
+      <div class="user-card-side">
+        <img src="${escapedAvatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="avatar-preview" id="${avatarPreviewId}" />
+        <button class="visibility-toggle ${user.isHidden ? 'hidden' : ''}" data-index="${user.originalIndex}" title="${translations[state.language].visibility}">
+          <span class="material-symbols-rounded">${user.isHidden ? 'visibility_off' : 'visibility'}</span>
         </button>
       </div>
 
-      <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-userid="${user.id}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
-      <input type="color" value="${user.color}" data-type="color" data-userid="${user.id}" title="${translations[state.language].userColor}" ${user.isHidden ? 'disabled' : ''} />
+      <div class="user-card-main">
+        <div class="user-card-row">
+          <label>
+            <span class="mini-label">${translations[state.language].userId}</span>
+            <input type="text" value="${escapedId}" data-type="id" data-index="${user.originalIndex}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
+          </label>
+          <label>
+            <span class="mini-label">${translations[state.language].displayName}</span>
+            <input type="text" value="${escapedDisplayName}" data-type="displayName" data-index="${user.originalIndex}" placeholder="上書きする場合のみ入力" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
+          </label>
+        </div>
+        <label class="avatar-input-container">
+          <span class="mini-label">${translations[state.language].avatarOverride}</span>
+          <span class="avatar-input-row">
+            <input type="text" value="${escapedAvatarUrl}" data-type="avatarUrl" data-index="${user.originalIndex}" data-preview-id="${avatarPreviewId}" class="avatar-url-input" placeholder="URL / DataURI" title="${translations[state.language].avatarOverride}" ${user.isHidden ? 'disabled' : ''} />
+            <button class="btn-upload" data-index="${user.originalIndex}" title="Upload Image" ${user.isHidden ? 'disabled' : ''}>
+              <span class="material-symbols-rounded" style="font-size: 16px;">upload_file</span>
+            </button>
+          </span>
+        </label>
+      </div>
 
       <div class="user-actions">
-        <span class="remove-user" data-userid="${user.id}">&times;</span>
+        <label>
+          <span class="mini-label">${translations[state.language].priority}</span>
+          <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-index="${user.originalIndex}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
+        </label>
+        <label>
+          <span class="mini-label">${translations[state.language].userColor}</span>
+          <input type="color" value="${user.color}" data-type="color" data-index="${user.originalIndex}" title="${translations[state.language].userColor}" ${user.isHidden ? 'disabled' : ''} />
+        </label>
+        <span class="remove-user" data-index="${user.originalIndex}">&times;</span>
       </div>
     `;
     userListEl.appendChild(div);
@@ -596,9 +930,8 @@ function renderUserInputs() {
   userListEl.querySelectorAll('input').forEach(input => {
     input.addEventListener('input', (e) => {
       const type = e.target.dataset.type;
-      const userId = e.target.dataset.userid;
-      const userIndex = state.users.findIndex(u => u.id === userId);
-      if (userIndex === -1) return;
+      const userIndex = Number(e.target.dataset.index);
+      if (!Number.isInteger(userIndex) || !state.users[userIndex]) return;
       let value = e.target.value;
       
       if (type === 'priority') {
@@ -609,7 +942,7 @@ function renderUserInputs() {
       
       // Real-time preview update for Avatar URL
       if (type === 'avatarUrl') {
-        const preview = document.getElementById(`preview-${userId}`);
+        const preview = document.getElementById(e.target.dataset.previewId);
         if (preview) preview.src = value || 'https://cdn.discordapp.com/embed/avatars/0.png';
       }
       
@@ -624,9 +957,8 @@ function renderUserInputs() {
 
   userListEl.querySelectorAll('.remove-user').forEach(span => {
     span.addEventListener('click', (e) => {
-      const userId = e.target.dataset.userid;
-      const userIndex = state.users.findIndex(u => u.id === userId);
-      if (userIndex === -1) return;
+      const userIndex = Number(e.target.dataset.index);
+      if (!Number.isInteger(userIndex) || !state.users[userIndex]) return;
       state.users.splice(userIndex, 1);
       renderUserInputs();
       applyStyles();
@@ -635,9 +967,9 @@ function renderUserInputs() {
 
   userListEl.querySelectorAll('.visibility-toggle').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const userId = e.target.dataset.userid || e.target.parentElement.dataset.userid;
-      const userIndex = state.users.findIndex(u => u.id === userId);
-      if (userIndex === -1) return;
+      const target = e.target.closest('.visibility-toggle');
+      const userIndex = Number(target?.dataset.index);
+      if (!Number.isInteger(userIndex) || !state.users[userIndex]) return;
       state.users[userIndex].isHidden = !state.users[userIndex].isHidden;
       renderUserInputs();
       applyStyles();
@@ -645,13 +977,22 @@ function renderUserInputs() {
   });
 }
 
+function escapeHtmlAttr(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function updateLanguageUI() {
   const t = translations[state.language];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (t[key]) {
-      // Skip elements that already have custom HTML content (like tabs with icons)
-      if (el.querySelector('.material-symbols-rounded')) {
+      const textSpan = el.querySelector(':scope > span:not(.material-symbols-rounded)');
+      if (textSpan) {
+        textSpan.textContent = t[key];
         return;
       }
       el.textContent = t[key];
@@ -665,8 +1006,7 @@ function updateLanguageUI() {
 function updateButtonTitles() {
   const t = translations[state.language];
   document.getElementById('copy-css').title = t.copyCss;
-  document.getElementById('download-css').title = t.saveCss;
-  document.getElementById('export-json').title = t.saveConfig;
+  document.getElementById('save-bundle').title = t.saveBundle;
   document.getElementById('import-json-btn').title = t.loadConfig;
 }
 
@@ -748,8 +1088,7 @@ function applyStyles() {
     });
   }
   displayedUsers.push(...unsetUsers);
-  console.log('applyStyles: displayedUsers length:', displayedUsers.length, 'unsetUsers length:', unsetUsers.length, 'onlyRegistered:', state.onlyRegistered);
-  console.log('state:', state);
+  state.displayedUsers = displayedUsers;
 
   const css = generateCSS(state);
   let styleEl = document.getElementById('generated-styles');
@@ -779,10 +1118,11 @@ function applyStyles() {
     cssOutput.textContent = css;
   }
 
-  state.displayedUsers = displayedUsers;
-
   // Update simulator with displayed users
   updateSimulator(displayedUsers, state);
+  if (currentSpeakingUserId) {
+    setSpeaking(currentSpeakingUserId, true);
+  }
 }
 
 init();
