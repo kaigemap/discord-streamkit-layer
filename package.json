@@ -1,5 +1,5 @@
 {
-  "name": "DiscordPyoko",
+  "name": "discord-streamkit-layer",
   "private": true,
   "version": "0.0.1",
   "type": "module",

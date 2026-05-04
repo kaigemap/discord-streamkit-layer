@@ -14,7 +14,7 @@ A web-based tool for generating custom CSS overlays for Discord StreamKit voice 
 
 ## Usage
 
-1. Visit the [live demo](https://your-username.github.io/streamkitdiscordoverlay/)
+1. Visit the [live demo](https://kaigemap.github.io/discord-streamkit-layer/)
 2. Configure your settings in the sidebar
 3. Add individual user settings with custom names and colors
 4. Use the visibility toggle to hide specific users
