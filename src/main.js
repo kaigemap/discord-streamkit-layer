@@ -939,7 +939,8 @@ function renderUserInputs() {
 
   userListEl.querySelectorAll('.remove-user').forEach(span => {
     span.addEventListener('click', (e) => {
-      const userIndex = Number(e.target.dataset.index);
+      const target = e.target.closest('.remove-user');
+      const userIndex = Number(target?.dataset.index);
       if (!Number.isInteger(userIndex) || !state.users[userIndex]) return;
       state.users.splice(userIndex, 1);
       renderUserInputs();
