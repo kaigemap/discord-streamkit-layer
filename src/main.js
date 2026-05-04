@@ -882,45 +882,27 @@ function renderUserInputs() {
     const div = document.createElement('div');
     div.className = `user-item ${user.isHidden ? 'user-item-hidden' : ''}`;
     div.innerHTML = `
-      <div class="user-card-side">
+      <div class="user-row-head">
         <img src="${escapedAvatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="avatar-preview" id="${avatarPreviewId}" />
+        <div class="user-row-title">
+          <input type="text" value="${escapedId}" data-type="id" data-index="${user.originalIndex}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
+          <input type="text" value="${escapedDisplayName}" data-type="displayName" data-index="${user.originalIndex}" placeholder="表示名" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
+        </div>
         <button class="visibility-toggle ${user.isHidden ? 'hidden' : ''}" data-index="${user.originalIndex}" title="${translations[state.language].visibility}">
           <span class="material-symbols-rounded">${user.isHidden ? 'visibility_off' : 'visibility'}</span>
         </button>
       </div>
 
-      <div class="user-card-main">
-        <div class="user-card-row">
-          <label>
-            <span class="mini-label">${translations[state.language].userId}</span>
-            <input type="text" value="${escapedId}" data-type="id" data-index="${user.originalIndex}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
-          </label>
-          <label>
-            <span class="mini-label">${translations[state.language].displayName}</span>
-            <input type="text" value="${escapedDisplayName}" data-type="displayName" data-index="${user.originalIndex}" placeholder="上書きする場合のみ入力" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
-          </label>
-        </div>
-        <label class="avatar-input-container">
-          <span class="mini-label">${translations[state.language].avatarOverride}</span>
-          <span class="avatar-input-row">
-            <input type="text" value="${escapedAvatarUrl}" data-type="avatarUrl" data-index="${user.originalIndex}" data-preview-id="${avatarPreviewId}" class="avatar-url-input" placeholder="URL / DataURI" title="${translations[state.language].avatarOverride}" ${user.isHidden ? 'disabled' : ''} />
-            <button class="btn-upload" data-index="${user.originalIndex}" title="Upload Image" ${user.isHidden ? 'disabled' : ''}>
-              <span class="material-symbols-rounded" style="font-size: 16px;">upload_file</span>
-            </button>
-          </span>
-        </label>
-      </div>
-
-      <div class="user-actions">
-        <label>
-          <span class="mini-label">${translations[state.language].priority}</span>
-          <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-index="${user.originalIndex}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
-        </label>
-        <label>
-          <span class="mini-label">${translations[state.language].userColor}</span>
-          <input type="color" value="${user.color}" data-type="color" data-index="${user.originalIndex}" title="${translations[state.language].userColor}" ${user.isHidden ? 'disabled' : ''} />
-        </label>
-        <span class="remove-user" data-index="${user.originalIndex}">&times;</span>
+      <div class="user-row-controls">
+        <input type="color" value="${user.color}" data-type="color" data-index="${user.originalIndex}" title="${translations[state.language].userColor}" ${user.isHidden ? 'disabled' : ''} />
+        <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-index="${user.originalIndex}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
+        <input type="text" value="${escapedAvatarUrl}" data-type="avatarUrl" data-index="${user.originalIndex}" data-preview-id="${avatarPreviewId}" class="avatar-url-input" placeholder="画像URL" title="${translations[state.language].avatarOverride}" ${user.isHidden ? 'disabled' : ''} />
+        <button class="btn-upload" data-index="${user.originalIndex}" title="Upload Image" ${user.isHidden ? 'disabled' : ''}>
+          <span class="material-symbols-rounded">upload_file</span>
+        </button>
+        <button type="button" class="remove-user" data-index="${user.originalIndex}" title="Remove">
+          <span class="material-symbols-rounded">close</span>
+        </button>
       </div>
     `;
     userListEl.appendChild(div);
