@@ -11,26 +11,28 @@ let state = {
     { id: '12345678902', displayName: '', avatarUrl: '', color: '#4b4bff', priority: 1 }
   ],
   baseFontSize: 14,
-  avatarSize: 100,
-  gap: 0,
-  direction: 'row',
+  avatarSize: 32,
+  gap: 8,
+  direction: 'column',
   wrap: 'nowrap',
   justifyContent: 'flex-start',
-  themeId: 'circle',
+  themeId: 'default',
   language: 'ja',
   onlyRegistered: false,
   hideNames: false,
   defaultColor: '#ffffff', // Added default color
   unsetUserCount: 3, // Unset user count
+  unsetUserPriority: 100, // Sort order for unset users
   displayedUsers: [], // For speaking simulation
-  padding: 20, // Container padding
-  borderRadius: 0, // Container border radius
+  padding: 0, // Container padding
+  borderRadius: 50, // Container border radius
   backgroundColor: 'rgba(0, 0, 0, 0)', // Container background
   nameBackgroundColor: 'rgba(30, 33, 36, 0.95)', // Name background
-  shadowEnabled: true, // Enable/disable shadow effect
-  themeAnimations: {}, // Theme-specific speaking animations
+  shadowEnabled: false, // Enable/disable shadow effect
+  speakingAnimations: { bounce: false, glow: false, shake: false },
   filePrefix: new Date().toISOString().slice(0, 10).replace(/-/g, ''), // File prefix
-  isOverlayMode: new URLSearchParams(window.location.search).get('mode') === 'overlay'
+  isOverlayMode: new URLSearchParams(window.location.search).get('mode') === 'overlay',
+  showMetadata: false
 };
 
 if (state.isOverlayMode) {
@@ -41,6 +43,24 @@ const userListEl = document.getElementById('user-list');
 const themeSelectorEl = document.getElementById('theme-selector');
 const simulatorEl = document.getElementById('discord-simulator');
 let currentSpeakingUserId = null;
+const DEFAULT_SPEAKING_ANIMATIONS = { bounce: false, glow: false, shake: false };
+
+function getDefaultAvatarUrl(index = 0) {
+  const colors = ['#5865f2', '#57f287', '#fee75c', '#eb459e', '#ed4245', '#4f545c'];
+  const fill = colors[index % colors.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="18" fill="${fill}"/><circle cx="40" cy="31" r="14" fill="#ffffff" opacity=".9"/><path d="M16 72c4-17 16-27 24-27s20 10 24 27" fill="#ffffff" opacity=".9"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+function iconSvg(name) {
+  const paths = {
+    eye: '<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/>',
+    eyeOff: '<path d="m3 3 18 18"/><path d="M10.7 5.2A9.6 9.6 0 0 1 12 5c6 0 9.5 7 9.5 7a16.8 16.8 0 0 1-2.3 3.1"/><path d="M6.6 6.7C4 8.5 2.5 12 2.5 12s3.5 7 9.5 7a9.4 9.4 0 0 0 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+    image: '<rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m6.5 17 4.2-4.2 3.1 3.1 1.7-1.7L19 17.7"/>',
+    close: '<path d="M6 6l12 12"/><path d="M18 6 6 18"/>'
+  };
+  return `<svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24">${paths[name]}</svg>`;
+}
 
 function init() {
   initializeUI();
@@ -53,25 +73,19 @@ function initializeUI() {
   updateLanguageUI();
   updateButtonTitles();
   renderPresetSelector();
-  applyDefaultPreset();
+  initializePresetState();
   renderPresetAnimationSettings();
   renderUserInputs();
   createSimulator(simulatorEl);
   updateUIFromState();
-  // Update unset button text
-  const btn = document.getElementById('toggle-unset-users');
-  btn.textContent = `Unset Users (${state.unsetUserCount})`;
 }
 
-function applyDefaultPreset() {
-  const preset = PRESETS.find(p => p.id === state.themeId);
-  if (preset) {
-    const { unsetUserCount, ...presetParams } = preset.preset;
-    Object.assign(state, presetParams);
-    updateUIFromState();
-    renderPresetAnimationSettings();
-    applyStyles();
-  }
+function initializePresetState() {
+  migrateThemeId();
+  migrateAnimationState();
+  updateUIFromState();
+  renderPresetAnimationSettings();
+  applyStyles();
 }
 
 function setupEventListeners() {
@@ -166,9 +180,12 @@ function setupToggleGroup(groupId, stateKey) {
 
   group.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      const target = e.target.closest('.toggle-btn');
+      if (!target || !group.contains(target)) return;
+
       group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      const value = e.target.dataset.value;
+      target.classList.add('active');
+      const value = target.dataset.value;
       if (stateKey === 'shadowEnabled') {
         state[stateKey] = value === 'true';
       } else {
@@ -184,7 +201,35 @@ function setupToggleGroupListeners() {
   setupToggleGroup('layout-wrap-group', 'wrap');
   setupToggleGroup('layout-align-group', 'justifyContent');
   setupToggleGroup('unlisted-toggle-group', 'onlyRegistered');
-  setupToggleGroup('shadow-enabled-group', 'shadowEnabled');
+  setupSwitchControl('shadow-enabled', () => state.shadowEnabled, (value) => {
+    state.shadowEnabled = value;
+    applyStyles();
+  });
+  setupSwitchControl('show-names', () => !state.hideNames, (value) => {
+    state.hideNames = !value;
+    applyStyles();
+  });
+}
+
+function setupSwitchControl(id, getValue, setValue) {
+  const control = document.getElementById(id);
+  if (!control) return;
+
+  control.addEventListener('click', () => {
+    setValue(!Boolean(getValue()));
+    syncSwitchState(id, getValue());
+  });
+
+  syncSwitchState(id, getValue());
+}
+
+function syncSwitchState(id, value) {
+  const control = document.getElementById(id);
+  if (!control) return;
+
+  const isActive = Boolean(value);
+  control.classList.toggle('active', isActive);
+  control.setAttribute('aria-checked', String(isActive));
 }
 
 function syncDualInput(id, sliderId, stateKey) {
@@ -197,8 +242,7 @@ function syncDualInput(id, sliderId, stateKey) {
     slider.value = state[stateKey];
     applyStyles();
     if (stateKey === 'unsetUserCount') {
-      const btn = document.getElementById('toggle-unset-users');
-      btn.textContent = `Unset Users (${state.unsetUserCount})`;
+      updateUnsetLabel();
     }
   };
 
@@ -214,12 +258,10 @@ function setupInputSyncListeners() {
   syncDualInput('layout-gap', 'layout-gap-slider', 'gap');
   syncDualInput('unset-count', 'unset-count-slider', 'unsetUserCount');
 
-  // Update button text
-  const updateUnsetButton = () => {
-    const btn = document.getElementById('toggle-unset-users');
-    btn.textContent = `Unset Users (${state.unsetUserCount})`;
-  };
-  updateUnsetButton();
+  document.getElementById('unset-priority').addEventListener('input', (e) => {
+    state.unsetUserPriority = parseInt(e.target.value) || 0;
+    applyStyles();
+  });
 
   // File prefix input
   document.getElementById('file-prefix').addEventListener('input', (e) => {
@@ -241,11 +283,6 @@ function setupInputSyncListeners() {
     const g = parseInt(hex.substring(3, 5), 16);
     const b = parseInt(hex.substring(5, 7), 16);
     state.nameBackgroundColor = `rgba(${r}, ${g}, ${b}, 0.95)`;
-    applyStyles();
-  });
-
-  document.getElementById('hide-names').addEventListener('change', (e) => {
-    state.hideNames = e.target.checked;
     applyStyles();
   });
 
@@ -304,7 +341,7 @@ function getBundleFilename() {
 }
 
 function getExportState() {
-  const { displayedUsers, isOverlayMode, ...exportState } = state;
+  const { displayedUsers, isOverlayMode, showMetadata, themeAnimations, ...exportState } = state;
   return exportState;
 }
 
@@ -445,8 +482,11 @@ function readZipTextFiles(buffer) {
 function importConfigText(text) {
   const config = JSON.parse(text);
   state = { ...state, ...config };
+  migrateThemeId();
+  migrateAnimationState();
   updateLanguageUI();
   updateUIFromState();
+  renderPresetAnimationSettings();
   applyStyles();
   renderPresetSelector();
   renderUserInputs();
@@ -454,14 +494,10 @@ function importConfigText(text) {
 }
 
 function setupActionButtons() {
-  document.getElementById('toggle-debug').addEventListener('click', (e) => {
-    e.currentTarget.classList.toggle('active');
-    toggleMetadata();
-  });
-
-  document.getElementById('toggle-unset-users').addEventListener('click', () => {
-    const panel = document.getElementById('unset-users-control');
-    panel.classList.toggle('hidden');
+  document.getElementById('toggle-debug').addEventListener('click', () => {
+    state.showMetadata = !state.showMetadata;
+    syncSwitchState('toggle-debug', state.showMetadata);
+    toggleMetadata(state.showMetadata);
   });
 
   document.getElementById('copy-css').addEventListener('click', () => {
@@ -538,49 +574,37 @@ function renderPresetAnimationSettings() {
   const preset = PRESETS.find(t => t.id === state.themeId);
   if (!preset) return;
 
-  const currentAnimations = state.themeAnimations[state.themeId] || preset.speakingAnimations || { bounce: true, glow: false, shake: false };
+  ensureSpeakingAnimations();
+  const currentAnimations = state.speakingAnimations;
 
   container.innerHTML = `
-    <div class="input-field horizontal">
+    <div class="input-field horizontal switch-field">
       <label>Bounce</label>
-      <div class="toggle-group" id="bounce-toggle-group">
-        <button type="button" class="toggle-btn ${currentAnimations.bounce ? 'active' : ''}" data-value="true">ON</button>
-        <button type="button" class="toggle-btn ${!currentAnimations.bounce ? 'active' : ''}" data-value="false">OFF</button>
-      </div>
+      ${renderSwitch('bounce-toggle', currentAnimations.bounce)}
     </div>
-    <div class="input-field horizontal">
+    <div class="input-field horizontal switch-field">
       <label>Glow</label>
-      <div class="toggle-group" id="glow-toggle-group">
-        <button type="button" class="toggle-btn ${currentAnimations.glow ? 'active' : ''}" data-value="true">ON</button>
-        <button type="button" class="toggle-btn ${!currentAnimations.glow ? 'active' : ''}" data-value="false">OFF</button>
-      </div>
+      ${renderSwitch('glow-toggle', currentAnimations.glow)}
     </div>
-    <div class="input-field horizontal">
+    <div class="input-field horizontal switch-field">
       <label>Shake</label>
-      <div class="toggle-group" id="shake-toggle-group">
-        <button type="button" class="toggle-btn ${currentAnimations.shake ? 'active' : ''}" data-value="true">ON</button>
-        <button type="button" class="toggle-btn ${!currentAnimations.shake ? 'active' : ''}" data-value="false">OFF</button>
-      </div>
+      ${renderSwitch('shake-toggle', currentAnimations.shake)}
     </div>
   `;
 
   // Add event listeners
   ['bounce', 'glow', 'shake'].forEach(animationType => {
-    const group = document.getElementById(`${animationType}-toggle-group`);
-    if (!group) return;
-    group.querySelectorAll('.toggle-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        const value = e.target.dataset.value === 'true';
-        if (!state.themeAnimations[state.themeId]) {
-          state.themeAnimations[state.themeId] = { ...currentAnimations };
-        }
-        state.themeAnimations[state.themeId][animationType] = value;
-        applyStyles();
-      });
+    setupSwitchControl(`${animationType}-toggle`, () => state.speakingAnimations[animationType], (value) => {
+      state.speakingAnimations[animationType] = value;
+      applyStyles();
     });
   });
+}
+
+function renderSwitch(id, isActive) {
+  return `<button id="${id}" class="switch-control compact-switch" type="button" role="switch" aria-checked="${String(Boolean(isActive))}">
+    <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+  </button>`;
 }
 
 function renderPresetSelector() {
@@ -792,9 +816,6 @@ function renderPresetSelector() {
 
     btn.addEventListener('click', () => {
       state.themeId = preset.id;
-      // Apply preset parameters, excluding unsetUserCount
-      const { unsetUserCount, ...presetParams } = preset.preset;
-      Object.assign(state, presetParams);
       updateUIFromState();
       document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
@@ -807,6 +828,23 @@ function renderPresetSelector() {
 }
 
 function getPresetPreviewMarkup(presetId) {
+  if (presetId === 'default') {
+    return `
+      <div class="thumb list">
+        <div class="stack">
+          <div class="row">
+            <div class="avatar"></div>
+            <div class="name">Discord</div>
+          </div>
+          <div class="row">
+            <div class="avatar idle"></div>
+            <div class="name">StreamKit</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   if (presetId === 'circle') {
     return `
       <div class="thumb circle">
@@ -830,34 +868,6 @@ function getPresetPreviewMarkup(presetId) {
     `;
   }
 
-  if (presetId === 'horizontal') {
-    return `
-      <div class="thumb badge">
-        <div class="cluster">
-          <div class="avatar"></div>
-          <div class="name">NAME</div>
-        </div>
-      </div>
-    `;
-  }
-
-  if (presetId === 'vertical') {
-    return `
-      <div class="thumb list">
-        <div class="stack">
-          <div class="row">
-            <div class="avatar"></div>
-            <div class="name">NAME</div>
-          </div>
-          <div class="row">
-            <div class="avatar idle"></div>
-            <div class="name">NAME</div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
   return `
     <div class="thumb portrait">
       <div class="standee"></div>
@@ -868,6 +878,26 @@ function getPresetPreviewMarkup(presetId) {
 function getPresetLabel(preset) {
   const key = `preset_${preset.id}`;
   return translations[state.language][key] || preset.name;
+}
+
+function migrateThemeId() {
+  if (!PRESETS.some(preset => preset.id === state.themeId)) {
+    state.themeId = 'default';
+  }
+}
+
+function migrateAnimationState() {
+  if (!state.speakingAnimations) {
+    state.speakingAnimations = state.themeAnimations?.[state.themeId] || { ...DEFAULT_SPEAKING_ANIMATIONS };
+  }
+  ensureSpeakingAnimations();
+}
+
+function ensureSpeakingAnimations() {
+  state.speakingAnimations = {
+    ...DEFAULT_SPEAKING_ANIMATIONS,
+    ...(state.speakingAnimations || {})
+  };
 }
 
 function renderUserInputs() {
@@ -883,13 +913,13 @@ function renderUserInputs() {
     div.className = `user-item ${user.isHidden ? 'user-item-hidden' : ''}`;
     div.innerHTML = `
       <div class="user-row-head">
-        <img src="${escapedAvatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="avatar-preview" id="${avatarPreviewId}" />
+        <img src="${escapedAvatarUrl || getDefaultAvatarUrl(user.originalIndex)}" class="avatar-preview" id="${avatarPreviewId}" />
         <div class="user-row-title">
           <input type="text" value="${escapedId}" data-type="id" data-index="${user.originalIndex}" placeholder="${translations[state.language].userId}" title="${translations[state.language].userId}" />
           <input type="text" value="${escapedDisplayName}" data-type="displayName" data-index="${user.originalIndex}" placeholder="表示名" title="${translations[state.language].displayName}" ${user.isHidden ? 'disabled' : ''} />
         </div>
         <button class="visibility-toggle ${user.isHidden ? 'hidden' : ''}" data-index="${user.originalIndex}" title="${translations[state.language].visibility}">
-          <span class="material-symbols-rounded">${user.isHidden ? 'visibility_off' : 'visibility'}</span>
+          ${iconSvg(user.isHidden ? 'eyeOff' : 'eye')}
         </button>
       </div>
 
@@ -898,10 +928,10 @@ function renderUserInputs() {
         <input type="number" value="${user.priority ?? sortedIndex}" data-type="priority" data-index="${user.originalIndex}" placeholder="0" title="${translations[state.language].priority}" ${user.isHidden ? 'disabled' : ''} />
         <input type="text" value="${escapedAvatarUrl}" data-type="avatarUrl" data-index="${user.originalIndex}" data-preview-id="${avatarPreviewId}" class="avatar-url-input" placeholder="画像URL" title="${translations[state.language].avatarOverride}" ${user.isHidden ? 'disabled' : ''} />
         <button class="btn-upload" data-index="${user.originalIndex}" title="Upload Image" ${user.isHidden ? 'disabled' : ''}>
-          <span class="material-symbols-rounded">upload_file</span>
+          ${iconSvg('image')}
         </button>
         <button type="button" class="remove-user" data-index="${user.originalIndex}" title="Remove">
-          <span class="material-symbols-rounded">close</span>
+          ${iconSvg('close')}
         </button>
       </div>
     `;
@@ -925,7 +955,7 @@ function renderUserInputs() {
       // Real-time preview update for Avatar URL
       if (type === 'avatarUrl') {
         const preview = document.getElementById(e.target.dataset.previewId);
-        if (preview) preview.src = value || 'https://cdn.discordapp.com/embed/avatars/0.png';
+        if (preview) preview.src = value || getDefaultAvatarUrl(userIndex);
       }
       
       // If priority changed, we might want to re-render to show new order
@@ -973,7 +1003,7 @@ function updateLanguageUI() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (t[key]) {
-      const textSpan = el.querySelector(':scope > span:not(.material-symbols-rounded)');
+      const textSpan = el.querySelector(':scope > span:not(.app-icon)');
       if (textSpan) {
         textSpan.textContent = t[key];
         return;
@@ -991,6 +1021,21 @@ function updateButtonTitles() {
   document.getElementById('copy-css').title = t.copyCss;
   document.getElementById('save-bundle').title = t.saveBundle;
   document.getElementById('import-json-btn').title = t.loadConfig;
+  document.getElementById('download-offline-app').title = t.offlineDownload;
+  document.querySelector('#layout-direction-group [data-value="row"]').title = t.directionRow;
+  document.querySelector('#layout-direction-group [data-value="column"]').title = t.directionColumn;
+  document.querySelector('#layout-wrap-group [data-value="nowrap"]').title = t.wrapOff;
+  document.querySelector('#layout-wrap-group [data-value="wrap"]').title = t.wrapOn;
+  document.querySelector('#layout-align-group [data-value="flex-start"]').title = t.alignStart;
+  document.querySelector('#layout-align-group [data-value="center"]').title = t.alignCenter;
+  document.querySelector('#layout-align-group [data-value="flex-end"]').title = t.alignEnd;
+}
+
+function updateUnsetLabel() {
+  const label = document.querySelector('label[for="unset-count"]');
+  if (label) {
+    label.textContent = `Unset User Count (${state.unsetUserCount})`;
+  }
 }
 
 function updateUIFromState() {
@@ -1009,6 +1054,9 @@ function updateUIFromState() {
   // Sync Unset User Count
   document.getElementById('unset-count').value = state.unsetUserCount;
   document.getElementById('unset-count-slider').value = state.unsetUserCount;
+  document.getElementById('unset-priority').value = state.unsetUserPriority;
+  updateUnsetLabel();
+  syncSwitchState('toggle-debug', state.showMetadata);
   
   // Sync Toggle Groups Helper
   function syncToggleGroup(groupId, currentValue) {
@@ -1023,9 +1071,8 @@ function updateUIFromState() {
   syncToggleGroup('layout-direction-group', state.direction);
   syncToggleGroup('layout-wrap-group', state.wrap);
   syncToggleGroup('layout-align-group', state.justifyContent);
-  syncToggleGroup('shadow-enabled-group', state.shadowEnabled ? 'true' : 'false');
-
-  document.getElementById('hide-names').checked = state.hideNames;
+  syncSwitchState('shadow-enabled', state.shadowEnabled);
+  syncSwitchState('show-names', !state.hideNames);
   
   // Sync Default Color
   const defColorInput = document.getElementById('default-color');
@@ -1057,20 +1104,19 @@ function updateUIFromState() {
 }
 
 function applyStyles() {
-  // Create displayed users: unset users + all registered users (always include for DOM, CSS controls visibility)
-  const sortedUsers = [...state.users].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
-  const displayedUsers = [...sortedUsers];
+  // Create displayed users with a unified sort model. CSS order mirrors this list.
   const unsetUsers = [];
   for (let i = 0; i < state.unsetUserCount; i++) {
     unsetUsers.push({
       id: `unset_${i}`,
       name: `Unset${i+1}`,
       color: state.defaultColor,
-      priority: 100 + i,
+      priority: (state.unsetUserPriority ?? 100) + i,
       isHidden: false
     });
   }
-  displayedUsers.push(...unsetUsers);
+  const displayedUsers = [...state.users, ...unsetUsers]
+    .sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
   state.displayedUsers = displayedUsers;
 
   const css = generateCSS(state);
@@ -1103,6 +1149,7 @@ function applyStyles() {
 
   // Update simulator with displayed users
   updateSimulator(displayedUsers, state);
+  toggleMetadata(state.showMetadata);
   if (currentSpeakingUserId) {
     setSpeaking(currentSpeakingUserId, true);
   }

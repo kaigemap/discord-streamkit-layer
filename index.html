@@ -4,9 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DiscordPyoko</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <style>
+      .app-icon {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+      }
+    </style>
   </head>
   <body class="dark-theme">
     <div id="app">
@@ -16,22 +21,27 @@
             <h1>DiscordPyoko</h1>
             <span class="version">v0.0.1</span>
           </div>
-          <div class="lang-switcher">
-            <button class="lang-btn" data-lang="en">EN</button>
-            <button class="lang-btn active" data-lang="ja">JA</button>
+          <div class="header-actions">
+            <div class="lang-switcher">
+              <button class="lang-btn" data-lang="en">EN</button>
+              <button class="lang-btn active" data-lang="ja">JA</button>
+            </div>
+            <a id="download-offline-app" class="btn-icon header-icon" href="./discordpyoko-offline.zip" download title="Download Offline App">
+              <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"/><path d="M12 12 4.5 7.8"/><path d="m12 12 7.5-4.2"/><path d="M12 12v8.5"/></svg>
+            </a>
           </div>
         </header>
 
         <div class="sidebar-body">
           <nav class="mode-rail" aria-label="Editor panes">
             <button type="button" class="mode-rail-btn active" data-pane-target="presets" title="Presets">
-              <span class="material-symbols-rounded">palette</span>
+              <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18h1.1a1.9 1.9 0 0 0 1.3-3.3 1.9 1.9 0 0 1 1.3-3.3H17a4 4 0 0 0 4-4C21 6.3 17 3 12 3Z"/><circle cx="7.5" cy="10" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/><circle cx="16.5" cy="11" r="1"/></svg>
             </button>
             <button type="button" class="mode-rail-btn" data-pane-target="members" title="Members">
-              <span class="material-symbols-rounded">group</span>
+              <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19"/><circle cx="10" cy="8" r="3"/><path d="M20 19v-1.3a3.2 3.2 0 0 0-2.4-3.1"/><path d="M16.3 5.2a3 3 0 0 1 0 5.6"/></svg>
             </button>
             <button type="button" class="mode-rail-btn" data-pane-target="output" title="Output">
-              <span class="material-symbols-rounded">ios_share</span>
+              <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 4-4 16"/></svg>
             </button>
           </nav>
 
@@ -50,10 +60,12 @@
                 <div class="inner-group-title" data-i18n="livePreview">Preview</div>
               </div>
               <div class="preview-control-grid">
-                <button id="toggle-debug" class="btn btn-secondary" data-i18n="toggleMetadata">Show IDs</button>
-                <button id="toggle-unset-users" class="btn btn-secondary">Unset Users</button>
+                <button id="toggle-debug" class="switch-control" type="button" role="switch" aria-checked="false">
+                  <span class="switch-label" data-i18n="toggleMetadata">Show IDs</span>
+                  <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                </button>
               </div>
-              <div id="unset-users-control" class="inline-panel hidden">
+              <div id="unset-users-control" class="inline-panel">
                 <label for="unset-count" class="mini-label">Unset User Count</label>
                 <div class="dual-input">
                   <input type="range" id="unset-count-slider" min="0" max="20" value="3" />
@@ -76,6 +88,10 @@
                     <button type="button" class="toggle-btn" data-value="hide" data-i18n="unlistedHide">Hide (Whitelist)</button>
                   </div>
                 </div>
+                <div class="toolbar-item sort-item">
+                  <label for="unset-priority" class="mini-label" data-i18n="unsetPriority">Unset Sort</label>
+                  <input type="number" id="unset-priority" value="100" />
+                </div>
                 <div class="toolbar-item">
                   <label class="mini-label" data-i18n="defaultColor">Color</label>
                   <input type="color" id="default-color" value="#ffffff" />
@@ -92,7 +108,7 @@
               <div class="pane-section-heading">
                 <div class="inner-group-title" data-i18n="groupCss">CSS Output</div>
                 <button id="copy-css" class="btn-icon" title="Copy CSS">
-                  <span class="material-symbols-rounded">content_copy</span>
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="9" width="10" height="10" rx="2"/><path d="M5 15V7a2 2 0 0 1 2-2h8"/></svg>
                 </button>
               </div>
               <pre id="css-output" class="sidebar-css-preview"></pre>
@@ -109,7 +125,7 @@
             <div class="footer-group-label" data-i18n="labelSave">Save</div>
             <div class="footer-row-icons">
               <button id="save-bundle" class="btn-icon" title="Save CSS + Settings">
-                <span class="material-symbols-rounded">download</span>
+                <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="m8 10 4 4 4-4"/><path d="M5 20h14"/></svg>
               </button>
             </div>
           </div>
@@ -118,7 +134,7 @@
             <div class="footer-group-label" data-i18n="labelLoad">Load</div>
             <div class="footer-row-icons">
               <button id="import-json-btn" class="btn-icon" title="Load .json">
-                <span class="material-symbols-rounded">upload</span>
+                <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20V10"/><path d="m8 14 4-4 4 4"/><path d="M5 4h14"/></svg>
               </button>
             </div>
             <input type="file" id="import-json-input" accept=".json,.zip,application/json,application/zip" style="display: none;" />
@@ -167,26 +183,40 @@
                 <input type="number" id="layout-gap" value="0" min="-50" max="200" />
               </div>
             </div>
-            <div class="input-field mini-control">
+            <div class="input-field mini-control layout-toggle-control">
               <label for="layout-direction" data-i18n="direction">Dir</label>
               <div class="toggle-group" id="layout-direction-group">
-                <button type="button" class="toggle-btn active" data-value="row" data-i18n="directionRow">Horiz</button>
-                <button type="button" class="toggle-btn" data-value="column" data-i18n="directionColumn">Vert</button>
+                <button type="button" class="toggle-btn icon-toggle active" data-value="row" title="Horizontal">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="7" width="6" height="10" rx="1.5"/><rect x="14" y="7" width="6" height="10" rx="1.5"/></svg>
+                </button>
+                <button type="button" class="toggle-btn icon-toggle" data-value="column" title="Vertical">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="7" y="4" width="10" height="6" rx="1.5"/><rect x="7" y="14" width="10" height="6" rx="1.5"/></svg>
+                </button>
               </div>
             </div>
-            <div class="input-field mini-control">
+            <div class="input-field mini-control layout-toggle-control">
               <label for="layout-wrap" data-i18n="wrap">Wrap</label>
               <div class="toggle-group" id="layout-wrap-group">
-                <button type="button" class="toggle-btn active" data-value="nowrap" data-i18n="wrapOff">No Wrap</button>
-                <button type="button" class="toggle-btn" data-value="wrap" data-i18n="wrapOn">Wrap</button>
+                <button type="button" class="toggle-btn icon-toggle active" data-value="nowrap" title="No Wrap">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 8h16"/><path d="M4 12h16"/><path d="M4 16h10"/><path d="m17 14 3 3"/><path d="m20 14-3 3"/></svg>
+                </button>
+                <button type="button" class="toggle-btn icon-toggle" data-value="wrap" title="Wrap">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 11h13a3 3 0 0 1 0 6h-3"/><path d="m16 14-3 3 3 3"/><path d="M4 17h5"/></svg>
+                </button>
               </div>
             </div>
-            <div class="input-field mini-control">
+            <div class="input-field mini-control layout-toggle-control align-toggle-control">
               <label for="layout-align" data-i18n="alignment">Align</label>
               <div class="toggle-group" id="layout-align-group">
-                <button type="button" class="toggle-btn active" data-value="flex-start" data-i18n="alignStart">Start</button>
-                <button type="button" class="toggle-btn" data-value="center" data-i18n="alignCenter">Center</button>
-                <button type="button" class="toggle-btn" data-value="flex-end" data-i18n="alignEnd">End</button>
+                <button type="button" class="toggle-btn icon-toggle active" data-value="flex-start" title="Start">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 4v16"/><rect x="9" y="7" width="10" height="4" rx="1"/><rect x="9" y="13" width="7" height="4" rx="1"/></svg>
+                </button>
+                <button type="button" class="toggle-btn icon-toggle" data-value="center" title="Center">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4v16"/><rect x="6" y="7" width="12" height="4" rx="1"/><rect x="8" y="13" width="8" height="4" rx="1"/></svg>
+                </button>
+                <button type="button" class="toggle-btn icon-toggle" data-value="flex-end" title="End">
+                  <svg class="app-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M19 4v16"/><rect x="5" y="7" width="10" height="4" rx="1"/><rect x="8" y="13" width="7" height="4" rx="1"/></svg>
+                </button>
               </div>
             </div>
             <div class="input-field mini-control color-control">
@@ -197,16 +227,17 @@
               <label for="name-background-color" data-i18n="nameBackgroundColor">Name Background</label>
               <input type="color" id="name-background-color" value="#1e2024" />
             </div>
-            <label class="check-control">
-              <span data-i18n="hideNames">Hide Names</span>
-              <input type="checkbox" id="hide-names" />
-            </label>
+            <div class="input-field mini-control">
+              <label for="show-names" data-i18n="showNames">Show Names</label>
+              <button id="show-names" class="switch-control compact-switch" type="button" role="switch" aria-checked="true">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+              </button>
+            </div>
             <div class="input-field mini-control">
               <label for="shadow-enabled" data-i18n="shadowEnabled">Shadow</label>
-              <div class="toggle-group" id="shadow-enabled-group">
-                <button type="button" class="toggle-btn active" data-value="true">ON</button>
-                <button type="button" class="toggle-btn" data-value="false">OFF</button>
-              </div>
+              <button id="shadow-enabled" class="switch-control compact-switch" type="button" role="switch" aria-checked="true">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+              </button>
             </div>
             <div id="theme-animation-settings" class="theme-animation-settings">
               <!-- Theme-specific animation settings will be injected here -->

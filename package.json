@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-offline.js",
+    "build:pages": "vite build",
+    "build:offline": "node scripts/build-offline.js",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d docs",
-    "bundle-offline": "npm run build && zip -r overlay-generator-offline.zip docs"
+    "bundle-offline": "npm run build:offline"
   },
   "devDependencies": {
     "gh-pages": "^6.3.0",

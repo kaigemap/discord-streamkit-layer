@@ -69,7 +69,10 @@ After a production build, GitHub Pages serves:
 docs/index.html
 docs/assets/index.js
 docs/assets/index.css
+docs/discordpyoko-offline.zip
 ```
+
+`npm run build` also creates `docs/discordpyoko-offline.zip`, a single-file offline version that can be downloaded from the app footer and opened locally.
 
 Do not edit files under `docs/` directly. Change `index.html` or `src/`, then run `npm run build`.
 
